@@ -3,63 +3,63 @@
     "title": "Kalkulator Kalori",
     "subtitle": "Hitung kalori makanan dan minuman dengan mudah dan cepat",
     "footerBranding": "[PROMPT ONE VISUALS]",
-    "screenTooSmall": "Screen too small, expand to see content"
+    "screenTooSmall": "Layar terlalu kecil, perbesar untuk melihat konten"
   },
   "actions": {
     "openApp": "Buka Aplikasi",
-    "loginGoogle": "Login Dengan Google",
+    "loginGoogle": "Masuk Dengan Google",
     "backToCalculator": "Kembali ke Kalkulator",
     "confirmSignOut": "Keluar dari akun?",
-    "signOut": "Sign Out",
+    "signOut": "Keluar",
     "save": "Simpan",
     "saving": "Menyimpan...",
     "cancel": "Batal",
     "close": "Tutup",
-    "noImage": "No Image",
+    "noImage": "Tanpa Gambar",
     "delete": "Hapus",
-    "edit": "Edit",
+    "edit": "Ubah",
     "add": "Tambahkan",
     "arrange": "Atur",
-    "show": "Show",
-    "hide": "Hide",
-    "returnHome": "Return to Home",
+    "show": "Tampilkan",
+    "hide": "Sembunyikan",
+    "returnHome": "Kembali ke Beranda",
     "goUp": "Ke Atas",
     "goDown": "Ke Bawah"
   },
   "header": {
-    "adminPage": "Admin Page",
+    "adminPage": "Halaman Admin",
     "splitLink": "Kalkulator / BMI",
     "calculator": "Kalkulator",
-    "bmiIndex": "BMI Index",
+    "bmiIndex": "Indeks BMI",
     "splitView": "Tampilan Split",
-    "setupProfile": "Setup Profile",
+    "setupProfile": "Atur Profil",
     "profileTitle": "Profil",
-    "userFallback": "User",
-    "guestLabel": "Guest",
-    "theme": "Theme",
-    "dark": "Dark",
-    "light": "Light",
+    "userFallback": "Pengguna",
+    "guestLabel": "Tamu",
+    "theme": "Tema",
+    "dark": "Gelap",
+    "light": "Terang",
     "language": "Bahasa",
     "languageEnglish": "English",
     "languageIndonesian": "Bahasa Indonesia",
     "confirmLanguageChange": "Ganti bahasa ke {{language}}?",
-    "bmiLoginRequiredConfirm": "BMI Index memerlukan login. Lanjutkan login?",
+    "bmiLoginRequiredConfirm": "Indeks BMI memerlukan login. Lanjutkan login?",
     "googleLoginFailed": "Gagal masuk dengan Google. Coba lagi.",
-    "profileSetupToast": "Harap lengkapi profil terlebih dahulu untuk menggunakan BMI index."
+    "profileSetupToast": "Harap lengkapi profil terlebih dahulu untuk menggunakan indeks BMI."
   },
   "landing": {
-    "heroAlt": "BMI Hero"
+    "heroAlt": "Gambar Hero BMI"
   },
   "loading": {
-    "index": "Memuat... (Index)",
-    "calculator": "Memuat... (Calculator)",
-    "healthMetrics": "Memuat... (Health Metrics)",
-    "adminAuth": "Memuat... (Admin Auth)",
-    "adminData": "Memuat... (Admin Data)"
+    "index": "Memuat... (Indeks)",
+    "calculator": "Memuat... (Kalkulator)",
+    "healthMetrics": "Memuat... (Metrik Kesehatan)",
+    "adminAuth": "Memuat... (Autentikasi Admin)",
+    "adminData": "Memuat... (Data Admin)"
   },
   "menu": {
     "emptyTitle": "Belum ada menu",
-    "emptySubtitle": "Tambahkan menu melalui Admin Dashboard",
+    "emptySubtitle": "Tambahkan menu melalui Dashboard Admin",
     "totalCalories": "Total Kalori",
     "clearAll": "Hapus Semua",
     "categories": {
@@ -73,33 +73,33 @@
     "accessDeniedBody": "Akun ini bukan admin. Silakan kembali ke kalkulator.",
     "tabs": {
       "overview": "Ringkasan",
-      "edit": "Edit",
+      "edit": "Ubah",
       "tools": "Alat"
     },
     "stats": {
-      "totalItems": "Total Menu Items",
+      "totalItems": "Total Item Menu",
       "totalCategories": "Total Kategori",
-      "hiddenItems": "Hidden Items",
-      "lowCalorie": "Low Calorie (0-150)",
-      "mediumCalorie": "Medium Calorie (151-500)",
-      "highCalorie": "High Calorie (501+)"
+      "hiddenItems": "Item Tersembunyi",
+      "lowCalorie": "Kalori Rendah (0-150)",
+      "mediumCalorie": "Kalori Sedang (151-500)",
+      "highCalorie": "Kalori Tinggi (501+)"
     },
-    "hiddenBreakdown": "Hidden Breakdown",
-    "hiddenLow": "Hidden Low",
-    "hiddenMedium": "Hidden Medium",
-    "hiddenHigh": "Hidden High",
-    "hiddenCategory": "Hidden {{category}}",
+    "hiddenBreakdown": "Rincian Tersembunyi",
+    "hiddenLow": "Tersembunyi Rendah",
+    "hiddenMedium": "Tersembunyi Sedang",
+    "hiddenHigh": "Tersembunyi Tinggi",
+    "hiddenCategory": "Tersembunyi {{category}}",
     "toolsComing": "Alat akan ditambahkan nanti.",
-    "itemHidden": "Hidden",
+    "itemHidden": "Tersembunyi",
     "addMenuTitle": "Tambahkan Menu",
-    "editMenuTitle": "Edit Menu",
+    "editMenuTitle": "Ubah Menu",
     "nameLabel": "Nama",
     "caloriesLabel": "Kalori",
-    "imageLabel": "Gambar (PNG/JPG, max 1MB)",
+    "imageLabel": "Gambar (PNG/JPG, maks 1MB)",
     "imageRequiredSuffix": " - wajib",
-    "previewAlt": "Preview",
+    "previewAlt": "Pratinjau",
     "errors": {
-      "timeoutNotice": "Koneksi time out, silahkan coba refresh. Jika perubahan belum muncul, coba lagi.",
+      "timeoutNotice": "Koneksi habis waktu, silakan coba refresh. Jika perubahan belum muncul, coba lagi.",
       "invalidImageType": "Format gambar harus PNG atau JPG.",
       "imageTooLarge": "Ukuran gambar maksimal 1MB.",
       "caloriesMustBeNumber": "Kalori harus angka.",
@@ -133,7 +133,7 @@
     "confirmDelete": "Hapus menu ini?"
   },
   "health": {
-    "loginRequiredTitle": "BMI Index membutuhkan login",
+    "loginRequiredTitle": "Indeks BMI membutuhkan login",
     "loginRequiredBody": "Silakan login dengan Google untuk melanjutkan.",
     "profileSaving": "Menyimpan profil...",
     "profileSaved": "Profil berhasil disimpan.",
@@ -144,11 +144,11 @@
       "age": "Usia",
       "weight": "Berat (kg)",
       "height": "Tinggi (cm)",
-      "gender": "Gender",
-      "male": "Male",
-      "female": "Female",
-      "username": "Username (opsional)",
-      "photo": "Foto (PNG/JPG, max 1MB)",
+      "gender": "Jenis Kelamin",
+      "male": "Laki-laki",
+      "female": "Perempuan",
+      "username": "Nama Pengguna (opsional)",
+      "photo": "Foto (PNG/JPG, maks 1MB)",
       "save": "Simpan Profil",
       "saving": "Menyimpan...",
       "invalidImageType": "Foto harus PNG atau JPG.",
@@ -156,114 +156,114 @@
     },
     "tabs": {
       "bmi": "BMI",
-      "bodyFat": "Body Fat %",
-      "tdee": "Daily Calorie Intake",
-      "burned": "Calories Burned",
-      "heart": "Heart Rate Zones"
+      "bodyFat": "Lemak Tubuh %",
+      "tdee": "Asupan Kalori Harian",
+      "burned": "Kalori Terbakar",
+      "heart": "Zona Detak Jantung"
     },
     "bmi": {
       "label": "BMI",
       "categoryLabel": "Kategori",
-      "idealWeightRange": "Ideal Weight Range",
+      "idealWeightRange": "Rentang Berat Ideal",
       "range": "{{min}} kg - {{max}} kg",
-      "empty": "â€”",
+      "empty": "—",
       "categories": {
-        "underweight": "Underweight",
+        "underweight": "Kurus",
         "normal": "Normal",
-        "overweight": "Overweight",
-        "obese": "Obese"
+        "overweight": "Kelebihan Berat",
+        "obese": "Obesitas"
       },
       "segments": {
-        "under": "Underweight < 18.5",
+        "under": "Kurus < 18.5",
         "normal": "Normal 18.5 - 24.9",
-        "over": "Overweight 25 - 29.9",
-        "obese": "Obese 30 - 39.9",
-        "morbid": "Morbid ≥ 40"
+        "over": "Kelebihan Berat 25 - 29.9",
+        "obese": "Obesitas 30 - 39.9",
+        "morbid": "Obesitas Parah ≥ 40"
       }
     },
     "bodyFat": {
-      "label": "Body Fat %",
+      "label": "Lemak Tubuh %",
       "categoryLabel": "Kategori",
-      "empty": "â€”",
+      "empty": "—",
       "categories": {
-        "low": "Low",
+        "low": "Rendah",
         "normal": "Normal",
-        "high": "High"
+        "high": "Tinggi"
       },
       "segments": {
-        "low": "Low",
+        "low": "Rendah",
         "normal": "Normal",
-        "high": "High"
+        "high": "Tinggi"
       },
-      "leanMass": "Lean Mass",
-      "fatMass": "Fat Mass"
+      "leanMass": "Massa Tanpa Lemak",
+      "fatMass": "Massa Lemak"
     },
     "tdee": {
-      "activityLevel": "Activity Level",
+      "activityLevel": "Tingkat Aktivitas",
       "bmr": "BMR",
-      "maintenance": "Maintenance",
-      "smoothLoss": "Smooth Loss",
-      "fastLoss": "Fast Loss",
-      "smoothGain": "Smooth Gain",
+      "maintenance": "Pemeliharaan",
+      "smoothLoss": "Penurunan Bertahap",
+      "fastLoss": "Penurunan Cepat",
+      "smoothGain": "Peningkatan Bertahap",
       "activityOptions": {
-        "sedentary": "Sedentary",
-        "light": "Light",
-        "moderate": "Moderate",
-        "active": "Active",
-        "extraActive": "Extra Active"
+        "sedentary": "Tidak Aktif",
+        "light": "Ringan",
+        "moderate": "Sedang",
+        "active": "Aktif",
+        "extraActive": "Sangat Aktif"
       }
     },
     "burned": {
-      "title": "Physical Activity",
-      "activity": "Activity",
-      "duration": "Duration (minutes)",
+      "title": "Aktivitas Fisik",
+      "activity": "Aktivitas",
+      "duration": "Durasi (menit)",
       "none": "Belum ada aktivitas ditambahkan.",
-      "total": "Total Calories Burned",
+      "total": "Total Kalori Terbakar",
       "removeSelected": "Hapus aktivitas terpilih",
       "addActivity": "Tambah Aktivitas",
       "remove": "Hapus",
       "activities": {
-        "walkingSlow": "Walking (slow)",
-        "walkingBrisk": "Walking (brisk)",
+        "walkingSlow": "Jalan (lambat)",
+        "walkingBrisk": "Jalan (cepat)",
         "jogging": "Jogging",
-        "cyclingModerate": "Cycling (moderate)",
-        "swimming": "Swimming",
-        "strengthTraining": "Strength training",
+        "cyclingModerate": "Bersepeda (sedang)",
+        "swimming": "Berenang",
+        "strengthTraining": "Latihan Kekuatan",
         "yoga": "Yoga",
-        "basketball": "Basketball"
+        "basketball": "Basket"
       }
     },
     "heart": {
-      "maximum": "Maximum Heart Rate",
+      "maximum": "Detak Jantung Maksimum",
       "zones": {
-        "recovery": "Recovery",
-        "fatBurn": "Fat Burn",
-        "aerobic": "Aerobic",
-        "threshold": "Threshold",
-        "maximum": "Maximum"
+        "recovery": "Pemulihan",
+        "fatBurn": "Pembakaran Lemak",
+        "aerobic": "Aerobik",
+        "threshold": "Ambang Batas",
+        "maximum": "Maksimum"
       },
       "descriptions": {
-        "recovery": "Improves overall health & recovery",
-        "fatBurn": "Improves basic endurance & fat burn",
-        "aerobic": "Improves aerobic capacity",
-        "threshold": "Increases performance threshold",
-        "maximum": "Develops maximum performance"
+        "recovery": "Meningkatkan kesehatan & pemulihan keseluruhan",
+        "fatBurn": "Meningkatkan daya tahan dasar & pembakaran lemak",
+        "aerobic": "Meningkatkan kapasitas aerobik",
+        "threshold": "Meningkatkan ambang performa",
+        "maximum": "Mengembangkan performa maksimum"
       }
     }
   },
   "splitView": {
     "noticeTitle": "Tampilan split hanya tersedia di layar besar.",
-    "noticeBody": "Gunakan Kalkulator atau BMI Index secara terpisah."
+    "noticeBody": "Gunakan Kalkulator atau Indeks BMI secara terpisah."
   },
   "notFound": {
-    "title": "Oops! Page not found",
-    "returnHome": "Return to Home"
+    "title": "Ups! Halaman tidak ditemukan",
+    "returnHome": "Kembali ke Beranda"
   },
   "units": {
     "kcal": "kkal",
     "kg": "kg",
     "cm": "cm",
-    "bpm": "BPM",
-    "min": "min"
+    "bpm": "DPM",
+    "min": "mnt"
   }
 }
