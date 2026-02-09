@@ -17,6 +17,7 @@ const Header: React.FC = () => {
   const [splitViewEnabled, setSplitViewEnabled] = useState(false);
   const [profileSetupVisible, setProfileSetupVisible] = useState(false);
   const [themeMode, setThemeMode] = useState<"dark" | "light">("dark");
+  const [languageMenuOpen, setLanguageMenuOpen] = useState(false);
 
   useEffect(() => {
     try {
@@ -151,8 +152,15 @@ const Header: React.FC = () => {
     document.documentElement.setAttribute("data-theme", next);
   };
 
-  const handleLanguageToggle = () => {
-    const next = i18n.language === "en" ? "id" : "en";
+  const handleLanguageSelect = (next: "id" | "en") => {
+    if (next === i18n.language) {
+      setLanguageMenuOpen(false);
+      return;
+    }
+    const label =
+      next === "en" ? t("header.languageEnglish") : t("header.languageIndonesian");
+    const confirmed = window.confirm(t("header.confirmLanguageChange", { language: label }));
+    if (!confirmed) return;
     i18n.changeLanguage(next);
     try {
       localStorage.setItem("language", next);
@@ -160,6 +168,7 @@ const Header: React.FC = () => {
       console.warn("Language preference save failed:", error);
     }
     document.documentElement.setAttribute("lang", next);
+    setLanguageMenuOpen(false);
   };
 
   const avatarSrc = profile?.photoUrl || "/defaultico.png";
@@ -338,35 +347,39 @@ const Header: React.FC = () => {
                   </span>
                 </div>
               </DropdownMenu.Item>
-              <div className="px-3 py-2 text-xs text-muted-foreground">{t("header.language")}</div>
-              <DropdownMenu.Item
-                className="cursor-pointer select-none rounded-md px-3 py-2 text-sm text-foreground hover:bg-muted"
-                onSelect={(event) => {
-                  event.preventDefault();
-                  handleLanguageToggle();
-                }}
-              >
-                <div className="flex items-center justify-between gap-4">
-                  <span>
-                    {i18n.language === "en"
-                      ? t("header.languageEnglish")
-                      : t("header.languageIndonesian")}
-                  </span>
-                  <span
-                    role="switch"
-                    aria-checked={i18n.language === "en"}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                      i18n.language === "en" ? "bg-primary" : "bg-muted"
-                    }`}
+              <DropdownMenu.Sub open={languageMenuOpen} onOpenChange={setLanguageMenuOpen}>
+                <DropdownMenu.SubTrigger className="cursor-pointer select-none rounded-md px-3 py-2 text-sm text-foreground hover:bg-muted flex items-center justify-between gap-4">
+                  <span>{t("header.language")}</span>
+                  <span className="text-muted-foreground">◀</span>
+                </DropdownMenu.SubTrigger>
+                <DropdownMenu.SubContent
+                  side="left"
+                  align="start"
+                  sideOffset={8}
+                  className="z-[80] min-w-[160px] rounded-lg border border-border bg-card shadow-lg p-1"
+                >
+                  <DropdownMenu.Item
+                    className="cursor-pointer select-none rounded-md px-3 py-2 text-sm text-foreground hover:bg-muted flex items-center justify-between"
+                    onSelect={(event) => {
+                      event.preventDefault();
+                      handleLanguageSelect("id");
+                    }}
                   >
-                    <span
-                      className={`inline-block h-5 w-5 transform rounded-full bg-background transition-transform ${
-                        i18n.language === "en" ? "translate-x-5" : "translate-x-1"
-                      }`}
-                    />
-                  </span>
-                </div>
-              </DropdownMenu.Item>
+                    <span>{t("header.languageIndonesian")}</span>
+                    {i18n.language === "id" && <span className="text-primary">✓</span>}
+                  </DropdownMenu.Item>
+                  <DropdownMenu.Item
+                    className="cursor-pointer select-none rounded-md px-3 py-2 text-sm text-foreground hover:bg-muted flex items-center justify-between"
+                    onSelect={(event) => {
+                      event.preventDefault();
+                      handleLanguageSelect("en");
+                    }}
+                  >
+                    <span>{t("header.languageEnglish")}</span>
+                    {i18n.language === "en" && <span className="text-primary">✓</span>}
+                  </DropdownMenu.Item>
+                </DropdownMenu.SubContent>
+              </DropdownMenu.Sub>
               <DropdownMenu.Separator className="my-2 h-px bg-border" />
               <DropdownMenu.Item
                 className="cursor-pointer select-none rounded-md px-3 py-2 text-sm text-destructive hover:bg-destructive/10"
