@@ -559,7 +559,7 @@ const HealthMetricsContent: React.FC<HealthMetricsContentProps> = ({ embedded = 
                   <p className="text-tv-subtitle text-foreground">{bmiCategory}</p>
                 </div>
               </div>
-              <div className="relative pt-6">
+              <div className="relative pt-4">
                 {bmi > 0 && (
                   <div
                     className="absolute top-0 flex flex-col items-center"
@@ -567,7 +567,7 @@ const HealthMetricsContent: React.FC<HealthMetricsContentProps> = ({ embedded = 
                   >
                     <span className="text-2xl text-foreground font-bold leading-none">{bmi.toFixed(1)}</span>
                     <div
-                      className="h-0 w-0 border-l-[18px] border-r-[18px] border-t-[24px] border-l-transparent border-r-transparent border-t-white"
+                      className="h-0 w-0 border-l-[18px] border-r-[18px] border-t-[24px] border-l-transparent border-r-transparent border-t-white -translate-y-1"
                       aria-hidden="true"
                     />
                   </div>
@@ -618,10 +618,29 @@ const HealthMetricsContent: React.FC<HealthMetricsContentProps> = ({ embedded = 
                 </div>
               </div>
               <div className="h-4 rounded-full bg-muted overflow-hidden">
-                <div className="flex h-full">
-                  <div className="bg-blue-500" style={{ width: `${bodyFatSegments.low}%` }} />
-                  <div className="bg-emerald-500" style={{ width: `${bodyFatSegments.normal}%` }} />
-                  <div className="bg-orange-500" style={{ width: `${bodyFatSegments.high}%` }} />
+                <div className="relative h-full">
+                  {bodyFat > 0 && (
+                    <div
+                      className="absolute top-0 flex flex-col items-center"
+                      style={{
+                        left: `${Math.min(Math.max((bodyFat / 45) * 100, 2), 98)}%`,
+                        transform: "translateX(-50%) translateY(-100%)",
+                      }}
+                    >
+                      <span className="text-2xl text-foreground font-bold leading-none">
+                        {bodyFat.toFixed(1)}
+                      </span>
+                      <div
+                        className="h-0 w-0 border-l-[18px] border-r-[18px] border-t-[24px] border-l-transparent border-r-transparent border-t-white -translate-y-1"
+                        aria-hidden="true"
+                      />
+                    </div>
+                  )}
+                  <div className="flex h-full">
+                    <div className="bg-blue-500" style={{ width: `${bodyFatSegments.low}%` }} />
+                    <div className="bg-emerald-500" style={{ width: `${bodyFatSegments.normal}%` }} />
+                    <div className="bg-orange-500" style={{ width: `${bodyFatSegments.high}%` }} />
+                  </div>
                 </div>
               </div>
               <div className="flex text-xs text-muted-foreground">
