@@ -10,6 +10,7 @@ import { useProfile } from '@/hooks/useProfile';
 const Header: React.FC = () => {
   const { t, i18n } = useTranslation();
   const { user, signOut, signInWithGoogle } = useAuth();
+  const APP_TITLE = "KALKULATOR KALORI";
   const location = useLocation();
   const navigate = useNavigate();
   const { profile, isAdmin, isLoading: profileLoading } = useProfile(Boolean(user));
@@ -199,11 +200,11 @@ const Header: React.FC = () => {
         <div className="flex items-center gap-3 md:gap-4">
           <img 
             src="/bmicalico1.png" 
-            alt={t("app.title")} 
+            alt={APP_TITLE} 
             className="h-10 w-10 md:h-14 md:w-14 lg:h-16 lg:w-16 object-contain"
           />
           <h1 className="text-tv-title text-foreground font-bold">
-            {t("app.title")}
+            {APP_TITLE}
           </h1>
         </div>
 
