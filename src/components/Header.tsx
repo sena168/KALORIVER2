@@ -10,6 +10,9 @@ import { useProfile } from '@/hooks/useProfile';
 const Header: React.FC = () => {
   const { t, i18n } = useTranslation();
   const { user, signOut, signInWithGoogle } = useAuth();
+  const getUserLanguageKey = (uid: string) => `language:${uid}`;
+  const getUserThemeKey = (uid: string) => `theme-mode:${uid}`;
+  const guestThemeKey = "theme-mode-guest";
   const APP_TITLE = "KALKULATOR KALORI";
   const location = useLocation();
   const navigate = useNavigate();
@@ -36,15 +39,69 @@ const Header: React.FC = () => {
     } catch {
       setProfileSetupVisible(false);
     }
-    try {
-      const storedTheme = localStorage.getItem("theme-mode");
-      const nextTheme = storedTheme === "light" ? "light" : "dark";
-      setThemeMode(nextTheme);
-      document.documentElement.setAttribute("data-theme", nextTheme);
-    } catch {
-      setThemeMode("dark");
-    }
+    setThemeMode("dark");
+    document.documentElement.setAttribute("data-theme", "dark");
   }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (isGuest && !user) {
+      if (i18n.language !== "id") i18n.changeLanguage("id");
+      document.documentElement.setAttribute("lang", "id");
+      return;
+    }
+    if (!user) {
+      if (i18n.language !== "id") i18n.changeLanguage("id");
+      document.documentElement.setAttribute("lang", "id");
+      return;
+    }
+    let stored: string | null = null;
+    try {
+      stored = localStorage.getItem(getUserLanguageKey(user.uid));
+    } catch {
+      stored = null;
+    }
+    const next = stored === "en" ? "en" : "id";
+    if (i18n.language !== next) i18n.changeLanguage(next);
+    document.documentElement.setAttribute("lang", next);
+  }, [user, isGuest, i18n]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (isGuest && !user) {
+      let stored: string | null = null;
+      try {
+        stored = localStorage.getItem(guestThemeKey);
+      } catch {
+        stored = null;
+      }
+      const next = stored === "light" ? "light" : "dark";
+      setThemeMode(next);
+      document.documentElement.setAttribute("data-theme", next);
+      return;
+    }
+    if (!user) {
+      setThemeMode("dark");
+      document.documentElement.setAttribute("data-theme", "dark");
+      return;
+    }
+    let stored: string | null = null;
+    try {
+      stored = localStorage.getItem(getUserThemeKey(user.uid));
+      if (!stored) {
+        const legacy = localStorage.getItem("theme-mode");
+        if (legacy) {
+          stored = legacy;
+          localStorage.setItem(getUserThemeKey(user.uid), legacy);
+        }
+      }
+    } catch {
+      stored = null;
+    }
+    const next = stored === "light" ? "light" : "dark";
+    setThemeMode(next);
+    document.documentElement.setAttribute("data-theme", next);
+  }, [user, isGuest]);
 
   useEffect(() => {
     if (!user || profileLoading) return;
@@ -146,7 +203,11 @@ const Header: React.FC = () => {
     const next = themeMode === "dark" ? "light" : "dark";
     setThemeMode(next);
     try {
-      localStorage.setItem("theme-mode", next);
+      if (user?.uid) {
+        localStorage.setItem(getUserThemeKey(user.uid), next);
+      } else if (isGuest) {
+        localStorage.setItem(guestThemeKey, next);
+      }
     } catch (error) {
       console.warn("Theme preference save failed:", error);
     }
@@ -164,7 +225,9 @@ const Header: React.FC = () => {
     if (!confirmed) return;
     i18n.changeLanguage(next);
     try {
-      localStorage.setItem("language", next);
+      if (user?.uid) {
+        localStorage.setItem(getUserLanguageKey(user.uid), next);
+      }
     } catch (error) {
       console.warn("Language preference save failed:", error);
     }

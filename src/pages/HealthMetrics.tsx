@@ -565,9 +565,9 @@ const HealthMetricsContent: React.FC<HealthMetricsContentProps> = ({ embedded = 
                     className="absolute top-0 flex flex-col items-center"
                     style={{ left: `${bmiMarker}%`, transform: "translateX(-50%)" }}
                   >
-                    <span className="text-xs text-foreground font-medium">{bmi.toFixed(1)}</span>
+                    <span className="text-2xl text-foreground font-bold leading-none">{bmi.toFixed(1)}</span>
                     <div
-                      className="h-0 w-0 border-l-[6px] border-r-[6px] border-t-[8px] border-l-transparent border-r-transparent border-t-white"
+                      className="h-0 w-0 border-l-[18px] border-r-[18px] border-t-[24px] border-l-transparent border-r-transparent border-t-white"
                       aria-hidden="true"
                     />
                   </div>

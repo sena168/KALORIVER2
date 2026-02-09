@@ -3,15 +3,7 @@ import { initReactI18next } from "react-i18next";
 import id from "./id.json";
 import en from "./en.json";
 
-const getInitialLanguage = () => {
-  if (typeof window === "undefined") return "id";
-  try {
-    const stored = localStorage.getItem("language");
-    return stored === "en" ? "en" : "id";
-  } catch {
-    return "id";
-  }
-};
+const getInitialLanguage = () => "id";
 
 i18n.use(initReactI18next).init({
   resources: {

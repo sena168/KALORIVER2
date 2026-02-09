@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { useTranslation } from "react-i18next";
@@ -9,6 +9,10 @@ const Landing: React.FC = () => {
   const APP_TITLE = "KALKULATOR KALORI";
   const APP_SUBTITLE = "Hitung kalori makanan dan minuman dengan mudah dan cepat";
   const BRANDING = "[PROMPT ONE VISUALS]";
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", "dark");
+  }, []);
 
   const handleGoogleLogin = async () => {
     const { error } = await signInWithGoogle();
