@@ -118,6 +118,10 @@ export const useCalorieState = (options?: UseCalorieStateOptions): UseCalorieSta
       skipPersistRef.current = false;
       return;
     }
+    if (persistDelayMs <= 0) {
+      onPersist(quantities);
+      return;
+    }
     const timeoutId = window.setTimeout(() => onPersist(quantities), persistDelayMs);
     return () => window.clearTimeout(timeoutId);
   }, [quantities, onPersist, persistDelayMs]);

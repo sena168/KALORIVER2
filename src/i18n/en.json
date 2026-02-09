@@ -57,12 +57,14 @@
     "adminAuth": "Loading... (Admin Auth)",
     "adminData": "Loading... (Admin Data)"
   },
-  "menu": {
-    "emptyTitle": "No menu yet",
-    "emptySubtitle": "Add menu through Admin Dashboard",
-    "totalCalories": "Total Calories",
-    "clearAll": "Clear All",
-    "categories": {
+    "menu": {
+      "emptyTitle": "No menu yet",
+      "emptySubtitle": "Add menu through Admin Dashboard",
+      "totalCalories": "Total Calories",
+      "saveCalories": "Save Calories",
+      "unsaved": "Unsaved",
+      "clearAll": "Clear All",
+      "categories": {
       "makanan-utama": "Main Dishes",
       "camilan": "Snacks",
       "minuman": "Beverages"

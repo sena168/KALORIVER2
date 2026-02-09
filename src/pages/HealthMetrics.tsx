@@ -15,6 +15,7 @@ const GUEST_CALORIE_KEY = "calorie-quantities-guest";
 const GUEST_BURN_KEY = "burn-list-guest";
 const userCalorieKey = (uid: string) => `calorie-quantities:${uid}`;
 const userBurnKey = (uid: string) => `burn-list:${uid}`;
+const dirtyKeyFor = (uid: string) => `calorie-quantities-dirty:${uid}`;
 
 const readStoredQuantities = (key: string): ItemQuantity => {
   if (typeof window === "undefined") return {};
@@ -26,6 +27,19 @@ const readStoredQuantities = (key: string): ItemQuantity => {
     return parsed;
   } catch {
     return {};
+  }
+};
+
+const readStoredWithFlag = (key: string): { data: ItemQuantity; hasKey: boolean } => {
+  if (typeof window === "undefined") return { data: {}, hasKey: false };
+  try {
+    const raw = window.localStorage.getItem(key);
+    if (raw === null) return { data: {}, hasKey: false };
+    const parsed = JSON.parse(raw) as Record<string, number>;
+    if (!parsed || typeof parsed !== "object") return { data: {}, hasKey: true };
+    return { data: parsed, hasKey: true };
+  } catch {
+    return { data: {}, hasKey: true };
   }
 };
 
@@ -198,15 +212,32 @@ const HealthMetricsContent: React.FC<HealthMetricsContentProps> = ({ embedded = 
     if (quantitiesHydrated) return;
     if (user && profileLoading) return;
     const key = user ? userCalorieKey(user.uid) : GUEST_CALORIE_KEY;
-    const initial = user ? (profile?.calorieQuantities ?? readStoredQuantities(key)) : readStoredQuantities(key);
+    const stored = readStoredWithFlag(key);
+    const initial = user
+      ? stored.hasKey
+        ? stored.data
+        : profile?.calorieQuantities ?? {}
+      : stored.data;
     setStoredQuantities(initial);
+    if (user && !stored.hasKey && profile?.calorieQuantities) {
+      try {
+        window.localStorage.setItem(key, JSON.stringify(profile.calorieQuantities));
+      } catch {
+        // ignore storage failures
+      }
+    }
     setQuantitiesHydrated(true);
   }, [quantitiesHydrated, user, profile?.calorieQuantities, profileLoading]);
 
   useEffect(() => {
     if (!user || !profile?.calorieQuantities) return;
     try {
-      window.localStorage.setItem(userCalorieKey(user.uid), JSON.stringify(profile.calorieQuantities));
+      const key = userCalorieKey(user.uid);
+      const hasLocal = window.localStorage.getItem(key) !== null;
+      const isDirty = window.localStorage.getItem(dirtyKeyFor(user.uid)) === "true";
+      if (!hasLocal || !isDirty) {
+        window.localStorage.setItem(key, JSON.stringify(profile.calorieQuantities));
+      }
     } catch {
       // ignore storage failures
     }

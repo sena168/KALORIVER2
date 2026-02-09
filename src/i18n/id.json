@@ -57,12 +57,14 @@
     "adminAuth": "Memuat... (Autentikasi Admin)",
     "adminData": "Memuat... (Data Admin)"
   },
-  "menu": {
-    "emptyTitle": "Belum ada menu",
-    "emptySubtitle": "Tambahkan menu melalui Dashboard Admin",
-    "totalCalories": "Total Kalori",
-    "clearAll": "Hapus Semua",
-    "categories": {
+    "menu": {
+      "emptyTitle": "Belum ada menu",
+      "emptySubtitle": "Tambahkan menu melalui Dashboard Admin",
+      "totalCalories": "Total Kalori",
+      "saveCalories": "Simpan Kalori",
+      "unsaved": "Belum disimpan",
+      "clearAll": "Hapus Semua",
+      "categories": {
       "makanan-utama": "Makanan Utama",
       "camilan": "Camilan",
       "minuman": "Minuman"

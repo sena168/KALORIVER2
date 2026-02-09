@@ -25,6 +25,19 @@ const readStoredQuantities = (key: string): ItemQuantity => {
   }
 };
 
+const readStoredWithFlag = (key: string): { data: ItemQuantity; hasKey: boolean } => {
+  if (typeof window === "undefined") return { data: {}, hasKey: false };
+  try {
+    const raw = window.localStorage.getItem(key);
+    if (raw === null) return { data: {}, hasKey: false };
+    const parsed = JSON.parse(raw) as Record<string, number>;
+    if (!parsed || typeof parsed !== "object") return { data: {}, hasKey: true };
+    return { data: parsed, hasKey: true };
+  } catch {
+    return { data: {}, hasKey: true };
+  }
+};
+
 interface CalculatorContentProps {
   embedded?: boolean;
 }
@@ -71,18 +84,35 @@ export const CalculatorContent: React.FC<CalculatorContentProps> = ({ embedded =
     return category?.items || [];
   }, [menuData, activeCategory]);
 
-  const initialQuantities = user ? profile?.calorieQuantities ?? {} : guestQuantities;
+  const userStored = user ? readStoredWithFlag(userCalorieKey(user.uid)) : { data: {}, hasKey: false };
+  const initialQuantities = user
+    ? userStored.hasKey
+      ? userStored.data
+      : profile?.calorieQuantities ?? {}
+    : guestQuantities;
   const hydrateKey = user ? `${user.uid}:${profile?.id ?? "none"}` : "guest";
   const persistQuantities = useCallback(
     (next: ItemQuantity) => {
+      const hasItems = Object.keys(next).length > 0;
       if (user) {
+        const dirtyKey = `calorie-quantities-dirty:${user.uid}`;
+        const savedKey = `calorie-quantities-saved:${user.uid}`;
         try {
           window.localStorage.setItem(userCalorieKey(user.uid), JSON.stringify(next));
+          window.localStorage.setItem(dirtyKey, "true");
           window.dispatchEvent(new Event("calorie-quantities-updated"));
         } catch {
           // ignore storage failures
         }
-        void saveProfile({ calorieQuantities: next });
+        if (!hasItems) {
+          try {
+            window.localStorage.setItem(savedKey, JSON.stringify(next));
+            window.localStorage.setItem(dirtyKey, "false");
+          } catch {
+            // ignore storage failures
+          }
+          void saveProfile({ calorieQuantities: next });
+        }
         return;
       }
       try {
@@ -116,7 +146,7 @@ export const CalculatorContent: React.FC<CalculatorContentProps> = ({ embedded =
       initialQuantities={initialQuantities}
       hydrateKey={hydrateKey}
       onPersist={persistQuantities}
-      persistDelayMs={800}
+      persistDelayMs={0}
     >
       <div className={`${embedded ? "h-full" : "h-screen"} flex flex-col overflow-hidden bg-background`}>
         {/* Fixed Header */}
