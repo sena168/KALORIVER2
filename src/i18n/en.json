@@ -224,6 +224,13 @@
       "duration": "Duration (minutes)",
       "none": "No activities added yet.",
       "total": "Total Calories Burned",
+      "consumed": "Total Calories Consumed",
+      "burned": "Total Calories Burned",
+      "remaining": "Remaining Calories",
+      "legend": {
+        "consumed": "Calories Consumed",
+        "burned": "Calories Burned"
+      },
       "removeSelected": "Remove selected activity",
       "addActivity": "Add Activity",
       "remove": "Remove",

@@ -38,6 +38,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const height = Number.isFinite(Number(body.height)) ? Number(body.height) : undefined;
     const gender = typeof body.gender === "string" ? body.gender : undefined;
     const username = typeof body.username === "string" ? body.username.trim() : undefined;
+    const calorieQuantities =
+      body.calorieQuantities &&
+      typeof body.calorieQuantities === "object" &&
+      !Array.isArray(body.calorieQuantities)
+        ? body.calorieQuantities
+        : undefined;
+    const burnList = Array.isArray(body.burnList) ? body.burnList : undefined;
 
     let photoUrl: string | undefined;
     if (typeof body.photoUrl === "string" && body.photoUrl.trim()) {
@@ -59,6 +66,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         username,
         photoUrl,
         email: email ?? undefined,
+        calorieQuantities,
+        burnList,
       },
       create: {
         uid,
@@ -69,6 +78,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         gender,
         username,
         photoUrl,
+        calorieQuantities,
+        burnList,
       },
     });
 

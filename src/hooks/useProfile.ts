@@ -11,6 +11,8 @@ export type UserProfile = {
   gender?: string | null;
   username?: string | null;
   photoUrl?: string | null;
+  calorieQuantities?: Record<string, number> | null;
+  burnList?: Array<{ key: string; met: number; minutes: number }> | null;
 };
 
 const getAuthHeaders = async () => {

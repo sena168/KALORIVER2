@@ -6,6 +6,24 @@ import FoodMenu from '@/components/FoodMenu';
 import BottomBar from '@/components/BottomBar';
 import { useMenuData } from '@/hooks/useMenuData';
 import { useTranslation } from "react-i18next";
+import { useAuth } from "@/hooks/useAuth";
+import { useProfile } from "@/hooks/useProfile";
+import type { ItemQuantity } from "@/hooks/useCalorieState";
+
+const GUEST_CALORIE_KEY = "calorie-quantities-guest";
+const userCalorieKey = (uid: string) => `calorie-quantities:${uid}`;
+const readStoredQuantities = (key: string): ItemQuantity => {
+  if (typeof window === "undefined") return {};
+  try {
+    const raw = window.localStorage.getItem(key);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw) as Record<string, number>;
+    if (!parsed || typeof parsed !== "object") return {};
+    return parsed;
+  } catch {
+    return {};
+  }
+};
 
 interface CalculatorContentProps {
   embedded?: boolean;
@@ -13,8 +31,30 @@ interface CalculatorContentProps {
 
 export const CalculatorContent: React.FC<CalculatorContentProps> = ({ embedded = false }) => {
   const { t } = useTranslation();
+  const { user } = useAuth();
+  const { profile, saveProfile } = useProfile(Boolean(user));
   const { categories: menuData, isLoading } = useMenuData({ includeHidden: false });
   const [activeCategory, setActiveCategory] = useState<string>(menuData[0]?.id || 'makanan-utama');
+  const [guestQuantities, setGuestQuantities] = useState<ItemQuantity>(() =>
+    readStoredQuantities(GUEST_CALORIE_KEY),
+  );
+
+  useEffect(() => {
+    if (!user) {
+      setGuestQuantities(readStoredQuantities(GUEST_CALORIE_KEY));
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (!user) return;
+    if (!profile?.calorieQuantities) return;
+    try {
+      window.localStorage.setItem(userCalorieKey(user.uid), JSON.stringify(profile.calorieQuantities));
+      window.dispatchEvent(new Event("calorie-quantities-updated"));
+    } catch {
+      // ignore storage failures
+    }
+  }, [user, profile?.calorieQuantities]);
 
   useEffect(() => {
     if (!menuData.find((category) => category.id === activeCategory) && menuData.length > 0) {
@@ -30,6 +70,31 @@ export const CalculatorContent: React.FC<CalculatorContentProps> = ({ embedded =
     const category = menuData.find(cat => cat.id === activeCategory);
     return category?.items || [];
   }, [menuData, activeCategory]);
+
+  const initialQuantities = user ? profile?.calorieQuantities ?? {} : guestQuantities;
+  const hydrateKey = user ? `${user.uid}:${profile?.id ?? "none"}` : "guest";
+  const persistQuantities = useCallback(
+    (next: ItemQuantity) => {
+      if (user) {
+        try {
+          window.localStorage.setItem(userCalorieKey(user.uid), JSON.stringify(next));
+          window.dispatchEvent(new Event("calorie-quantities-updated"));
+        } catch {
+          // ignore storage failures
+        }
+        void saveProfile({ calorieQuantities: next });
+        return;
+      }
+      try {
+        window.localStorage.setItem(GUEST_CALORIE_KEY, JSON.stringify(next));
+        window.dispatchEvent(new Event("calorie-quantities-updated"));
+      } catch {
+        // ignore storage failures
+      }
+      setGuestQuantities(next);
+    },
+    [user, saveProfile],
+  );
 
   if (isLoading) {
     return (
@@ -47,7 +112,12 @@ export const CalculatorContent: React.FC<CalculatorContentProps> = ({ embedded =
   }
 
   return (
-    <CalorieProvider>
+    <CalorieProvider
+      initialQuantities={initialQuantities}
+      hydrateKey={hydrateKey}
+      onPersist={persistQuantities}
+      persistDelayMs={800}
+    >
       <div className={`${embedded ? "h-full" : "h-screen"} flex flex-col overflow-hidden bg-background`}>
         {/* Fixed Header */}
         {!embedded && <Header />}

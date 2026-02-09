@@ -62,6 +62,8 @@ model UserProfile {
   gender    String?
   username  String?
   photoUrl  String?
+  calorieQuantities Json?
+  burnList          Json?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

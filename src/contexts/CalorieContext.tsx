@@ -1,10 +1,21 @@
 import React, { createContext, useContext, ReactNode } from 'react';
-import { useCalorieState, UseCalorieStateReturn } from '@/hooks/useCalorieState';
+import { useCalorieState, UseCalorieStateReturn, ItemQuantity } from '@/hooks/useCalorieState';
 
 const CalorieContext = createContext<UseCalorieStateReturn | null>(null);
 
-export const CalorieProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const calorieState = useCalorieState();
+export const CalorieProvider: React.FC<{
+  children: ReactNode;
+  initialQuantities?: ItemQuantity;
+  hydrateKey?: string;
+  onPersist?: (next: ItemQuantity) => void;
+  persistDelayMs?: number;
+}> = ({ children, initialQuantities, hydrateKey, onPersist, persistDelayMs }) => {
+  const calorieState = useCalorieState({
+    initialQuantities,
+    hydrateKey,
+    onPersist,
+    persistDelayMs,
+  });
   
   return (
     <CalorieContext.Provider value={calorieState}>

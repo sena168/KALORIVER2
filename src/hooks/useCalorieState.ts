@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { useMenuData } from '@/hooks/useMenuData';
 
 export interface ItemQuantity {
@@ -15,10 +15,38 @@ export interface UseCalorieStateReturn {
   getQuantity: (itemId: string) => number;
 }
 
-export const useCalorieState = (): UseCalorieStateReturn => {
-  const [quantities, setQuantities] = useState<ItemQuantity>({});
+export interface UseCalorieStateOptions {
+  initialQuantities?: ItemQuantity;
+  hydrateKey?: string;
+  onPersist?: (next: ItemQuantity) => void;
+  persistDelayMs?: number;
+}
+
+export const useCalorieState = (options?: UseCalorieStateOptions): UseCalorieStateReturn => {
+  const initialQuantities = options?.initialQuantities ?? {};
+  const hydrateKey = options?.hydrateKey;
+  const persistDelayMs = options?.persistDelayMs ?? 600;
+  const onPersist = options?.onPersist;
+  const [quantities, setQuantities] = useState<ItemQuantity>(initialQuantities);
+  const hydrateKeyRef = useRef<string | undefined>(hydrateKey);
+  const didHydrateRef = useRef(false);
+  const skipPersistRef = useRef(true);
   
   const { categories: menuData } = useMenuData({ includeHidden: false });
+
+  useEffect(() => {
+    if (hydrateKeyRef.current !== hydrateKey) {
+      hydrateKeyRef.current = hydrateKey;
+      didHydrateRef.current = false;
+    }
+  }, [hydrateKey]);
+
+  useEffect(() => {
+    if (didHydrateRef.current) return;
+    setQuantities(initialQuantities);
+    didHydrateRef.current = true;
+    skipPersistRef.current = true;
+  }, [initialQuantities]);
   
   // Create a map of item IDs to their calorie values for quick lookup
   const calorieMap = useMemo(() => {
@@ -83,6 +111,16 @@ export const useCalorieState = (): UseCalorieStateReturn => {
   const getQuantity = useCallback((itemId: string) => {
     return quantities[itemId] || 0;
   }, [quantities]);
+
+  useEffect(() => {
+    if (!onPersist) return;
+    if (skipPersistRef.current) {
+      skipPersistRef.current = false;
+      return;
+    }
+    const timeoutId = window.setTimeout(() => onPersist(quantities), persistDelayMs);
+    return () => window.clearTimeout(timeoutId);
+  }, [quantities, onPersist, persistDelayMs]);
 
   return {
     quantities,

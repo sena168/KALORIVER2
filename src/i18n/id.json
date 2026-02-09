@@ -224,6 +224,13 @@
       "duration": "Durasi (menit)",
       "none": "Belum ada aktivitas ditambahkan.",
       "total": "Total Kalori Terbakar",
+      "consumed": "Total Kalori Dikonsumsi",
+      "burned": "Total Kalori Dibakar",
+      "remaining": "Kalori Tersisa",
+      "legend": {
+        "consumed": "Kalori Dikonsumsi",
+        "burned": "Kalori Dibakar"
+      },
       "removeSelected": "Hapus aktivitas terpilih",
       "addActivity": "Tambah Aktivitas",
       "remove": "Hapus",

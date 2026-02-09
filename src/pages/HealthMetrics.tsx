@@ -1,14 +1,52 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useRef } from "react";
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
 import { HealthMetricsProvider, useHealthMetrics } from "@/contexts/HealthMetricsContext";
+import { useMenuData } from "@/hooks/useMenuData";
+import type { ItemQuantity } from "@/hooks/useCalorieState";
 import { useTranslation } from "react-i18next";
 
 const MAX_IMAGE_SIZE = 1024 * 1024;
 const ALLOWED_IMAGE_TYPES = new Set(["image/png", "image/jpeg", "image/jpg"]);
+const GUEST_CALORIE_KEY = "calorie-quantities-guest";
+const GUEST_BURN_KEY = "burn-list-guest";
+const userCalorieKey = (uid: string) => `calorie-quantities:${uid}`;
+const userBurnKey = (uid: string) => `burn-list:${uid}`;
+
+const readStoredQuantities = (key: string): ItemQuantity => {
+  if (typeof window === "undefined") return {};
+  try {
+    const raw = window.localStorage.getItem(key);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw) as Record<string, number>;
+    if (!parsed || typeof parsed !== "object") return {};
+    return parsed;
+  } catch {
+    return {};
+  }
+};
+
+const readStoredBurnList = (key: string) => {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = window.localStorage.getItem(key);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter(
+      (entry) =>
+        entry &&
+        typeof entry.key === "string" &&
+        Number.isFinite(Number(entry.met)) &&
+        Number.isFinite(Number(entry.minutes)),
+    );
+  } catch {
+    return [];
+  }
+};
 
 type TabKey = "bmi" | "body-fat" | "tdee" | "burned" | "heart";
 
@@ -49,6 +87,7 @@ const HealthMetricsContent: React.FC<HealthMetricsContentProps> = ({ embedded = 
   const { t } = useTranslation();
   const { user, loading, signInWithGoogle } = useAuth();
   const { profile, isLoading: profileLoading, error: profileError, saveProfile } = useProfile(Boolean(user));
+  const { categories: menuData } = useMenuData({ includeHidden: false });
   const { age, weight, height, gender, setAge, setWeight, setHeight, setGender } = useHealthMetrics();
 
   const [activeTab, setActiveTab] = useState<TabKey>("bmi");
@@ -65,11 +104,32 @@ const HealthMetricsContent: React.FC<HealthMetricsContentProps> = ({ embedded = 
   const [burnList, setBurnList] = useState<Array<{ key: string; met: number; minutes: number }>>([]);
   const [selectedBurnIndices, setSelectedBurnIndices] = useState<number[]>([]);
   const [forceReady, setForceReady] = useState(false);
+  const [storedQuantities, setStoredQuantities] = useState<ItemQuantity>({});
+  const [burnHydrated, setBurnHydrated] = useState(false);
+  const [quantitiesHydrated, setQuantitiesHydrated] = useState(false);
+  const burnPersistSkipRef = useRef(true);
 
   const burnActivity = useMemo(
     () => metActivities.find((item) => item.key === burnActivityKey) ?? metActivities[0],
     [burnActivityKey],
   );
+
+  const calorieMap = useMemo(() => {
+    const map: Record<string, number> = {};
+    menuData.forEach((category) => {
+      category.items.forEach((item) => {
+        map[item.id] = item.calories;
+      });
+    });
+    return map;
+  }, [menuData]);
+
+  const totalConsumed = useMemo(() => {
+    return Object.entries(storedQuantities).reduce((total, [itemId, quantity]) => {
+      const calories = calorieMap[itemId] || 0;
+      return total + calories * quantity;
+    }, 0);
+  }, [storedQuantities, calorieMap]);
 
   useEffect(() => {
     if (!profile || hasHydrated) return;
@@ -118,6 +178,58 @@ const HealthMetricsContent: React.FC<HealthMetricsContentProps> = ({ embedded = 
       }
     }
   }, [profile, profileLoading]);
+
+  useEffect(() => {
+    setBurnHydrated(false);
+    setQuantitiesHydrated(false);
+  }, [user?.uid]);
+
+  useEffect(() => {
+    if (burnHydrated) return;
+    if (user && profileLoading) return;
+    const key = user ? userBurnKey(user.uid) : GUEST_BURN_KEY;
+    const initial = user ? (profile?.burnList ?? readStoredBurnList(key)) : readStoredBurnList(key);
+    setBurnList(initial);
+    setBurnHydrated(true);
+    burnPersistSkipRef.current = true;
+  }, [burnHydrated, user, profile?.burnList, profileLoading]);
+
+  useEffect(() => {
+    if (quantitiesHydrated) return;
+    if (user && profileLoading) return;
+    const key = user ? userCalorieKey(user.uid) : GUEST_CALORIE_KEY;
+    const initial = user ? (profile?.calorieQuantities ?? readStoredQuantities(key)) : readStoredQuantities(key);
+    setStoredQuantities(initial);
+    setQuantitiesHydrated(true);
+  }, [quantitiesHydrated, user, profile?.calorieQuantities, profileLoading]);
+
+  useEffect(() => {
+    if (!user || !profile?.calorieQuantities) return;
+    try {
+      window.localStorage.setItem(userCalorieKey(user.uid), JSON.stringify(profile.calorieQuantities));
+    } catch {
+      // ignore storage failures
+    }
+  }, [user, profile?.calorieQuantities]);
+
+  useEffect(() => {
+    if (!user || !profile?.burnList) return;
+    try {
+      window.localStorage.setItem(userBurnKey(user.uid), JSON.stringify(profile.burnList));
+    } catch {
+      // ignore storage failures
+    }
+  }, [user, profile?.burnList]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const handleUpdate = () => {
+      const key = user ? userCalorieKey(user.uid) : GUEST_CALORIE_KEY;
+      setStoredQuantities(readStoredQuantities(key));
+    };
+    window.addEventListener("calorie-quantities-updated", handleUpdate);
+    return () => window.removeEventListener("calorie-quantities-updated", handleUpdate);
+  }, [user]);
 
   useEffect(() => {
     const timeoutId = window.setTimeout(() => {
@@ -332,12 +444,49 @@ const HealthMetricsContent: React.FC<HealthMetricsContentProps> = ({ embedded = 
     setSelectedBurnIndices([]);
   };
 
+  useEffect(() => {
+    if (burnPersistSkipRef.current) {
+      burnPersistSkipRef.current = false;
+      return;
+    }
+    const key = user ? userBurnKey(user.uid) : GUEST_BURN_KEY;
+    const payload = burnList;
+    const timeoutId = window.setTimeout(() => {
+      try {
+        window.localStorage.setItem(key, JSON.stringify(payload));
+      } catch {
+        // ignore storage failures
+      }
+      if (user) {
+        void saveProfile({ burnList: payload });
+      }
+    }, 800);
+    return () => window.clearTimeout(timeoutId);
+  }, [burnList, user, saveProfile]);
+
   const totalBurned = useMemo(() => {
     return burnList.reduce((sum, entry) => {
       const calories = (entry.met * 3.5 * weight) / 200 * entry.minutes;
       return sum + calories;
     }, 0);
   }, [burnList, weight]);
+
+  const remainingCalories = useMemo(() => {
+    return Math.max(totalConsumed - totalBurned, 0);
+  }, [totalConsumed, totalBurned]);
+
+  const burnPercent = useMemo(() => {
+    if (totalConsumed <= 0) return 0;
+    return Math.min(totalBurned / totalConsumed, 1);
+  }, [totalConsumed, totalBurned]);
+
+  const burnMarker = useMemo(() => burnPercent * 100, [burnPercent]);
+
+  const burnMarkerStyle = useMemo(() => {
+    if (burnMarker <= 0) return { left: "0%", transform: "translateX(0)" };
+    if (burnMarker >= 100) return { left: "100%", transform: "translateX(-100%)" };
+    return { left: `${burnMarker}%`, transform: "translateX(-50%)" };
+  }, [burnMarker]);
 
   const hasBurnSelection = selectedBurnIndices.length > 0;
 
@@ -746,6 +895,49 @@ const HealthMetricsContent: React.FC<HealthMetricsContentProps> = ({ embedded = 
               <div>
                 <p className="text-tv-small text-muted-foreground">{t("health.burned.title")}</p>
               </div>
+              <div className="space-y-3">
+                <div className="relative pt-[56px]">
+                  <div
+                    className="absolute top-0 flex flex-col items-center"
+                    style={burnMarkerStyle}
+                  >
+                    <span className="text-2xl text-foreground font-bold leading-none">
+                      {Math.round(totalBurned)}
+                    </span>
+                    <div
+                      className="h-0 w-0 border-l-[18px] border-r-[18px] border-t-[24px] border-l-transparent border-r-transparent border-t-white"
+                      aria-hidden="true"
+                    />
+                  </div>
+                  <div className="h-4 rounded-full bg-muted overflow-hidden">
+                    <div className="h-full bg-emerald-500" style={{ width: `${burnPercent * 100}%` }} />
+                  </div>
+                </div>
+                <div className="flex text-xs text-muted-foreground">
+                  <div className="flex items-center gap-2" style={{ width: "50%" }}>
+                    <span className="h-2 w-2 rounded-full bg-muted" />
+                    <span className="truncate">{t("health.burned.legend.consumed")}</span>
+                  </div>
+                  <div className="flex items-center gap-2" style={{ width: "50%" }}>
+                    <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                    <span className="truncate">{t("health.burned.legend.burned")}</span>
+                  </div>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-muted rounded-lg p-4">
+                  <p className="text-tv-small text-muted-foreground">{t("health.burned.consumed")}</p>
+                  <p className="text-tv-title font-bold text-primary">{Math.round(totalConsumed)}</p>
+                </div>
+                <div className="bg-muted rounded-lg p-4">
+                  <p className="text-tv-small text-muted-foreground">{t("health.burned.burned")}</p>
+                  <p className="text-tv-title font-bold text-primary">{Math.round(totalBurned)}</p>
+                </div>
+              </div>
+              <div className="bg-muted rounded-lg p-4">
+                <p className="text-tv-small text-muted-foreground">{t("health.burned.remaining")}</p>
+                <p className="text-tv-title font-bold text-primary">{Math.round(remainingCalories)}</p>
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <label className="block">
                   <span className="text-tv-small text-muted-foreground">{t("health.burned.activity")}</span>
@@ -814,10 +1006,6 @@ const HealthMetricsContent: React.FC<HealthMetricsContentProps> = ({ embedded = 
                 {burnList.length === 0 && (
                   <div className="text-sm text-muted-foreground">{t("health.burned.none")}</div>
                 )}
-              </div>
-              <div className="bg-muted rounded-lg p-4">
-                <p className="text-tv-small text-muted-foreground">{t("health.burned.total")}</p>
-                <p className="text-tv-title font-bold text-primary">{Math.round(totalBurned)}</p>
               </div>
 
               <button
