@@ -195,6 +195,11 @@
         "normal": "Normal",
         "high": "Tinggi"
       },
+      "segmentRanges": {
+        "low": "< 18",
+        "normal": "18 - 25",
+        "high": "> 25"
+      },
       "leanMass": "Massa Tanpa Lemak",
       "fatMass": "Massa Lemak"
     },

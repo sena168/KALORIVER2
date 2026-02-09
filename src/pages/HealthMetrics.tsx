@@ -279,9 +279,27 @@ const HealthMetricsContent: React.FC<HealthMetricsContentProps> = ({ embedded = 
 
   const bodyFatSegmentWidths = useMemo(
     () => [
-      { key: "low", label: t("health.bodyFat.segments.low"), color: "bg-blue-500", width: bodyFatSegments.low },
-      { key: "normal", label: t("health.bodyFat.segments.normal"), color: "bg-emerald-500", width: bodyFatSegments.normal },
-      { key: "high", label: t("health.bodyFat.segments.high"), color: "bg-orange-500", width: bodyFatSegments.high },
+      {
+        key: "low",
+        label: t("health.bodyFat.segments.low"),
+        range: t("health.bodyFat.segmentRanges.low"),
+        color: "bg-blue-500",
+        width: bodyFatSegments.low,
+      },
+      {
+        key: "normal",
+        label: t("health.bodyFat.segments.normal"),
+        range: t("health.bodyFat.segmentRanges.normal"),
+        color: "bg-emerald-500",
+        width: bodyFatSegments.normal,
+      },
+      {
+        key: "high",
+        label: t("health.bodyFat.segments.high"),
+        range: t("health.bodyFat.segmentRanges.high"),
+        color: "bg-orange-500",
+        width: bodyFatSegments.high,
+      },
     ],
     [bodyFatSegments, t],
   );
@@ -559,7 +577,7 @@ const HealthMetricsContent: React.FC<HealthMetricsContentProps> = ({ embedded = 
                   <p className="text-tv-subtitle text-foreground">{bmiCategory}</p>
                 </div>
               </div>
-              <div className="relative pt-4">
+              <div className="relative pt-[56px]">
                 {bmi > 0 && (
                   <div
                     className="absolute top-0 flex flex-col items-center"
@@ -567,7 +585,7 @@ const HealthMetricsContent: React.FC<HealthMetricsContentProps> = ({ embedded = 
                   >
                     <span className="text-2xl text-foreground font-bold leading-none">{bmi.toFixed(1)}</span>
                     <div
-                      className="h-0 w-0 border-l-[18px] border-r-[18px] border-t-[24px] border-l-transparent border-r-transparent border-t-white -translate-y-1"
+                      className="h-0 w-0 border-l-[18px] border-r-[18px] border-t-[24px] border-l-transparent border-r-transparent border-t-white"
                       aria-hidden="true"
                     />
                   </div>
@@ -617,25 +635,25 @@ const HealthMetricsContent: React.FC<HealthMetricsContentProps> = ({ embedded = 
                   <p className="text-tv-subtitle text-foreground">{bodyFatCategory}</p>
                 </div>
               </div>
-              <div className="h-4 rounded-full bg-muted overflow-hidden">
-                <div className="relative h-full">
-                  {bodyFat > 0 && (
+              <div className="relative pt-[56px]">
+                {bodyFat > 0 && (
+                  <div
+                    className="absolute top-0 flex flex-col items-center"
+                    style={{
+                      left: `${Math.min(Math.max((bodyFat / 40) * 100, 2), 98)}%`,
+                      transform: "translateX(-50%)",
+                    }}
+                  >
+                    <span className="text-2xl text-foreground font-bold leading-none">
+                      {bodyFat.toFixed(1)}
+                    </span>
                     <div
-                      className="absolute top-0 flex flex-col items-center"
-                      style={{
-                        left: `${Math.min(Math.max((bodyFat / 45) * 100, 2), 98)}%`,
-                        transform: "translateX(-50%) translateY(-100%)",
-                      }}
-                    >
-                      <span className="text-2xl text-foreground font-bold leading-none">
-                        {bodyFat.toFixed(1)}
-                      </span>
-                      <div
-                        className="h-0 w-0 border-l-[18px] border-r-[18px] border-t-[24px] border-l-transparent border-r-transparent border-t-white -translate-y-1"
-                        aria-hidden="true"
-                      />
-                    </div>
-                  )}
+                      className="h-0 w-0 border-l-[18px] border-r-[18px] border-t-[24px] border-l-transparent border-r-transparent border-t-white"
+                      aria-hidden="true"
+                    />
+                  </div>
+                )}
+                <div className="h-4 rounded-full bg-muted overflow-hidden">
                   <div className="flex h-full">
                     <div className="bg-blue-500" style={{ width: `${bodyFatSegments.low}%` }} />
                     <div className="bg-emerald-500" style={{ width: `${bodyFatSegments.normal}%` }} />
@@ -651,7 +669,9 @@ const HealthMetricsContent: React.FC<HealthMetricsContentProps> = ({ embedded = 
                     style={{ width: `${segment.width}%` }}
                   >
                     <span className={`h-2 w-2 rounded-full ${segment.color}`} />
-                    <span className="truncate">{segment.label}</span>
+                    <span className="truncate">
+                      {segment.label} {segment.range}
+                    </span>
                   </div>
                 ))}
               </div>

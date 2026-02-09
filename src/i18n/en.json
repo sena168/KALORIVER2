@@ -195,6 +195,11 @@
         "normal": "Normal",
         "high": "High"
       },
+      "segmentRanges": {
+        "low": "< 18",
+        "normal": "18 - 25",
+        "high": "> 25"
+      },
       "leanMass": "Lean Mass",
       "fatMass": "Fat Mass"
     },
