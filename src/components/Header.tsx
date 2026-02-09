@@ -135,9 +135,12 @@ const Header: React.FC = () => {
     } finally {
       try {
         localStorage.removeItem("guest-access");
+        localStorage.removeItem(guestThemeKey);
       } catch (error) {
         console.warn("Guest access cleanup failed:", error);
       }
+      setThemeMode("dark");
+      document.documentElement.setAttribute("data-theme", "dark");
       window.location.assign("/");
     }
   };
