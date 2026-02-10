@@ -8,10 +8,12 @@ const Index: React.FC = () => {
   const { t } = useTranslation();
   const { user, loading } = useAuth();
   const [forceReady, setForceReady] = useState(false);
+  const guestParam =
+    typeof window !== "undefined" &&
+    new URLSearchParams(window.location.search).get("guest") === "1";
   const hasGuestAccess =
     typeof window !== "undefined" &&
-    (localStorage.getItem("guest-access") === "true" ||
-      new URLSearchParams(window.location.search).get("guest") === "1");
+    (localStorage.getItem("guest-access") === "true" || guestParam);
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -19,6 +21,17 @@ const Index: React.FC = () => {
     }, 4000);
     return () => clearTimeout(timeoutId);
   }, []);
+
+  useEffect(() => {
+    if (user) return;
+    if (!guestParam) return;
+    try {
+      localStorage.clear();
+      localStorage.setItem("guest-access", "true");
+    } catch (error) {
+      console.warn("Guest access storage failed:", error);
+    }
+  }, [user, guestParam]);
 
   // Show loading state
   if (loading && !forceReady) {

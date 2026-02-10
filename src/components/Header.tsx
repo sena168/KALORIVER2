@@ -134,8 +134,12 @@ const Header: React.FC = () => {
       await signOut();
     } finally {
       try {
-        localStorage.removeItem("guest-access");
-        localStorage.removeItem(guestThemeKey);
+        if (isGuest && !user) {
+          localStorage.clear();
+        } else {
+          localStorage.removeItem("guest-access");
+          localStorage.removeItem(guestThemeKey);
+        }
       } catch (error) {
         console.warn("Guest access cleanup failed:", error);
       }

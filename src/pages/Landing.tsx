@@ -27,6 +27,7 @@ const Landing: React.FC = () => {
 
   const handleOpenApp = () => {
     try {
+      localStorage.clear();
       localStorage.setItem("guest-access", "true");
     } catch (error) {
       console.warn("Guest access storage failed:", error);
