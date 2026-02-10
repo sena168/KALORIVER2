@@ -183,6 +183,7 @@ const HealthMetricsContent: React.FC<HealthMetricsContentProps> = ({ embedded = 
 
   useEffect(() => {
     if (profileLoading) return;
+    if (profileError) return;
     if (!profile) {
       setShowProfileSetup(true);
       try {
@@ -191,7 +192,7 @@ const HealthMetricsContent: React.FC<HealthMetricsContentProps> = ({ embedded = 
         // ignore storage failures
       }
     }
-  }, [profile, profileLoading]);
+  }, [profile, profileLoading, profileError]);
 
   useEffect(() => {
     setBurnHydrated(false);
@@ -738,13 +739,15 @@ const HealthMetricsContent: React.FC<HealthMetricsContentProps> = ({ embedded = 
                           />
                         </div>
                       </div>
-                      <Button
-                        onClick={handleSaveProfile}
-                        disabled={!isDirty || isSaving || !isProfileValid}
-                        variant={isDirty && isProfileValid ? "default" : "secondary"}
-                      >
-                        {isSaving ? t("health.profile.saving") : t("health.profile.save")}
-                      </Button>
+                      {(isDirty || isSaving) && (
+                        <Button
+                          onClick={handleSaveProfile}
+                          disabled={isSaving || !isProfileValid}
+                          variant={isProfileValid ? "default" : "secondary"}
+                        >
+                          {isSaving ? t("health.profile.saving") : t("health.profile.save")}
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </>
