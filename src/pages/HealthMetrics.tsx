@@ -210,9 +210,14 @@ const HealthMetricsContent: React.FC<HealthMetricsContentProps> = ({ embedded = 
 
   useEffect(() => {
     if (quantitiesHydrated) return;
-    if (user && profileLoading) return;
     const key = user ? userCalorieKey(user.uid) : GUEST_CALORIE_KEY;
     const stored = readStoredWithFlag(key);
+    if (user && stored.hasKey) {
+      setStoredQuantities(stored.data);
+      setQuantitiesHydrated(true);
+      return;
+    }
+    if (user && profileLoading) return;
     const initial = user
       ? stored.hasKey
         ? stored.data
@@ -228,6 +233,8 @@ const HealthMetricsContent: React.FC<HealthMetricsContentProps> = ({ embedded = 
     }
     setQuantitiesHydrated(true);
   }, [quantitiesHydrated, user, profile?.calorieQuantities, profileLoading]);
+
+  const isCalorieSyncing = Boolean(user) && !quantitiesHydrated;
 
   useEffect(() => {
     if (!user || !profile?.calorieQuantities) return;
@@ -923,8 +930,14 @@ const HealthMetricsContent: React.FC<HealthMetricsContentProps> = ({ embedded = 
 
           {activeTab === "burned" && (
             <div className="bg-card border border-border rounded-2xl p-6 shadow-md space-y-4 relative">
-              <div>
+              <div className="flex items-center justify-between">
                 <p className="text-tv-small text-muted-foreground">{t("health.burned.title")}</p>
+                {isCalorieSyncing && (
+                  <div className="inline-flex items-center gap-2 rounded-full border border-border bg-muted/40 px-3 py-1">
+                    <span className="h-2 w-2 rounded-full bg-primary animate-pulse" />
+                    <span className="text-xs text-muted-foreground">{t("health.burned.syncingCalories")}</span>
+                  </div>
+                )}
               </div>
               <div className="space-y-3">
                 <div className="relative pt-[56px]">

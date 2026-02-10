@@ -97,16 +97,19 @@ export const CalculatorContent: React.FC<CalculatorContentProps> = ({ embedded =
       if (user) {
         const dirtyKey = `calorie-quantities-dirty:${user.uid}`;
         const savedKey = `calorie-quantities-saved:${user.uid}`;
+        const serializedNext = JSON.stringify(next);
         try {
-          window.localStorage.setItem(userCalorieKey(user.uid), JSON.stringify(next));
-          window.localStorage.setItem(dirtyKey, "true");
+          const savedSnapshot = window.localStorage.getItem(savedKey);
+          const isSavedSnapshot = savedSnapshot === serializedNext;
+          window.localStorage.setItem(userCalorieKey(user.uid), serializedNext);
+          window.localStorage.setItem(dirtyKey, isSavedSnapshot ? "false" : "true");
           window.dispatchEvent(new Event("calorie-quantities-updated"));
         } catch {
           // ignore storage failures
         }
         if (!hasItems) {
           try {
-            window.localStorage.setItem(savedKey, JSON.stringify(next));
+            window.localStorage.setItem(savedKey, serializedNext);
             window.localStorage.setItem(dirtyKey, "false");
           } catch {
             // ignore storage failures

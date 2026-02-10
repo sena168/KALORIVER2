@@ -220,9 +220,10 @@
         "extraActive": "Sangat Aktif"
       }
     },
-    "burned": {
-      "title": "Aktivitas Fisik",
-      "activity": "Aktivitas",
+      "burned": {
+        "title": "Aktivitas Fisik",
+        "syncingCalories": "Menyinkronkan kalori...",
+        "activity": "Aktivitas",
       "duration": "Durasi (menit)",
       "none": "Belum ada aktivitas ditambahkan.",
       "total": "Total Kalori Terbakar",

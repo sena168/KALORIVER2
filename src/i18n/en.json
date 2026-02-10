@@ -220,9 +220,10 @@
         "extraActive": "Extra Active"
       }
     },
-    "burned": {
-      "title": "Physical Activity",
-      "activity": "Activity",
+      "burned": {
+        "title": "Physical Activity",
+        "syncingCalories": "Syncing calories...",
+        "activity": "Activity",
       "duration": "Duration (minutes)",
       "none": "No activities added yet.",
       "total": "Total Calories Burned",

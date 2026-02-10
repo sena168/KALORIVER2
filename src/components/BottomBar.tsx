@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCalories } from '@/contexts/CalorieContext';
@@ -24,7 +24,7 @@ const BottomBar: React.FC<BottomBarProps> = ({ embedded = false }) => {
 
   const locale = i18n.language === "id" ? "id-ID" : i18n.language;
   const formattedCalories = new Intl.NumberFormat(locale).format(totalCalories);
-  const showSave = Boolean(user) && totalCalories > 0;
+  const showSave = Boolean(user) && isDirty && totalCalories > 0;
   const showUnsaved = Boolean(user) && isDirty && totalCalories > 0;
 
   useEffect(() => {
@@ -58,6 +58,7 @@ const BottomBar: React.FC<BottomBarProps> = ({ embedded = false }) => {
         window.localStorage.setItem(userCalorieKey(user.uid), JSON.stringify(quantities));
         window.localStorage.setItem(savedKeyFor(user.uid), JSON.stringify(quantities));
         window.localStorage.setItem(dirtyKeyFor(user.uid), "false");
+        window.dispatchEvent(new Event("calorie-quantities-updated"));
       } catch {
         // ignore storage failures
       }
