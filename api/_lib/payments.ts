@@ -126,7 +126,7 @@ const createDuitkuCheckout = async (input: CheckoutInput): Promise<CheckoutResul
     "https://sandbox.duitku.com/webapi/api/merchant/v2/inquiry";
   const callbackUrl =
     safeString(process.env.DUITKU_CALLBACK_URL) ||
-    `${getAppBaseUrl()}/api/payments/webhook/duitku`;
+    `${getAppBaseUrl()}/api/payments/webhook?provider=duitku`;
   const returnUrl =
     safeString(process.env.DUITKU_RETURN_URL) || `${getAppBaseUrl()}/payment`;
   const expiryMinutes = Math.max(10, Number(process.env.DUITKU_EXPIRY_MINUTES || 60));
