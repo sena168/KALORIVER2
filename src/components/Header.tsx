@@ -23,6 +23,27 @@ const Header: React.FC = () => {
   const [themeMode, setThemeMode] = useState<"dark" | "light">("dark");
   const [languageMenuOpen, setLanguageMenuOpen] = useState(false);
 
+  const confirmWithToast = (message: string) =>
+    new Promise<boolean>((resolve) => {
+      const id = toast(message, {
+        duration: Infinity,
+        action: {
+          label: t("actions.confirm"),
+          onClick: () => {
+            resolve(true);
+            toast.dismiss(id);
+          },
+        },
+        cancel: {
+          label: t("actions.cancel"),
+          onClick: () => {
+            resolve(false);
+            toast.dismiss(id);
+          },
+        },
+      });
+    });
+
   useEffect(() => {
     try {
       setIsGuest(localStorage.getItem("guest-access") === "true");
@@ -119,16 +140,25 @@ const Header: React.FC = () => {
   const isCalculatorPage = location.pathname === "/";
   const isHealthMetricsPage = location.pathname === "/health-metrics";
   const isSplitViewPage = location.pathname === "/kalkulator-bmi";
+  const isPaymentPage = location.pathname === "/payment";
   const showAdminButton = Boolean(user) && isAdmin && !isAdminPage;
   const showSplitViewLink = isAdminPage && splitViewEnabled;
   const showCalculatorButton =
-    Boolean(user) && !isCalculatorPage && !isSplitViewPage && !(isAdminPage && splitViewEnabled);
+    Boolean(user) &&
+    !isCalculatorPage &&
+    !isSplitViewPage &&
+    !isPaymentPage &&
+    !(isAdminPage && splitViewEnabled);
   const showBmiButton =
-    (isCalculatorPage || isAdminPage) && !isSplitViewPage && !(isAdminPage && splitViewEnabled);
+    (isCalculatorPage || isAdminPage) &&
+    !isSplitViewPage &&
+    !isPaymentPage &&
+    !(isAdminPage && splitViewEnabled);
+  const showPaymentButton = Boolean(user) && !isPaymentPage;
   const showSplitOption = Boolean(user) || isGuest;
 
   const handleSignOut = async () => {
-    const confirmed = window.confirm(t("actions.confirmSignOut"));
+    const confirmed = await confirmWithToast(t("actions.confirmSignOut"));
     if (!confirmed) return;
     try {
       await signOut();
@@ -153,14 +183,14 @@ const Header: React.FC = () => {
     if (user) return;
     if (!isGuest) return;
     event.preventDefault();
-    const confirmed = window.confirm(t("header.bmiLoginRequiredConfirm"));
+    const confirmed = await confirmWithToast(t("header.bmiLoginRequiredConfirm"));
     if (!confirmed) return;
     const { error } = await signInWithGoogle();
     if (!error) {
       window.location.assign("/health-metrics");
       return;
     }
-    window.alert(t("header.googleLoginFailed"));
+    toast.error(t("header.googleLoginFailed"));
   };
 
   const handleSplitViewClick = async () => {
@@ -180,7 +210,7 @@ const Header: React.FC = () => {
       return;
     }
     if (!isGuest) return;
-    const confirmed = window.confirm(t("header.bmiLoginRequiredConfirm"));
+    const confirmed = await confirmWithToast(t("header.bmiLoginRequiredConfirm"));
     if (!confirmed) return;
     const { error } = await signInWithGoogle();
     if (!error) {
@@ -188,7 +218,7 @@ const Header: React.FC = () => {
       navigate("/kalkulator-bmi");
       return;
     }
-    window.alert(t("header.googleLoginFailed"));
+    toast.error(t("header.googleLoginFailed"));
   };
 
   const handleProfileSetupToggle = () => {
@@ -221,14 +251,16 @@ const Header: React.FC = () => {
     document.documentElement.setAttribute("data-theme", next);
   };
 
-  const handleLanguageSelect = (next: "id" | "en") => {
+  const handleLanguageSelect = async (next: "id" | "en") => {
     if (next === i18n.language) {
       setLanguageMenuOpen(false);
       return;
     }
     const label =
       next === "en" ? t("header.languageEnglish") : t("header.languageIndonesian");
-    const confirmed = window.confirm(t("header.confirmLanguageChange", { language: label }));
+    const confirmed = await confirmWithToast(
+      t("header.confirmLanguageChange", { language: label }),
+    );
     if (!confirmed) return;
     i18n.changeLanguage(next);
     try {
@@ -305,6 +337,11 @@ const Header: React.FC = () => {
                 {t("header.bmiIndex")}
               </Button>
             )
+          )}
+          {showPaymentButton && (
+            <Button asChild variant="secondary" className="touch-target">
+              <Link to="/payment">{t("header.payment")}</Link>
+            </Button>
           )}
           <div className="flex items-center gap-2">
             <span className="text-tv-small text-muted-foreground hidden md:inline-block">
@@ -421,11 +458,9 @@ const Header: React.FC = () => {
               <DropdownMenu.Sub open={languageMenuOpen} onOpenChange={setLanguageMenuOpen}>
                 <DropdownMenu.SubTrigger className="cursor-pointer select-none rounded-md px-3 py-2 text-sm text-foreground hover:bg-muted flex items-center justify-between gap-4">
                   <span>{t("header.language")}</span>
-                  <span className="text-muted-foreground">◀</span>
+                  <span className="text-muted-foreground">&lt;</span>
                 </DropdownMenu.SubTrigger>
                 <DropdownMenu.SubContent
-                  side="left"
-                  align="start"
                   sideOffset={8}
                   className="z-[80] min-w-[160px] rounded-lg border border-border bg-card shadow-lg p-1"
                 >
@@ -437,7 +472,7 @@ const Header: React.FC = () => {
                     }}
                   >
                     <span>{t("header.languageIndonesian")}</span>
-                    {i18n.language === "id" && <span className="text-primary">✓</span>}
+                    {i18n.language === "id" && <span className="text-primary">v</span>}
                   </DropdownMenu.Item>
                   <DropdownMenu.Item
                     className="cursor-pointer select-none rounded-md px-3 py-2 text-sm text-foreground hover:bg-muted flex items-center justify-between"
@@ -447,7 +482,7 @@ const Header: React.FC = () => {
                     }}
                   >
                     <span>{t("header.languageEnglish")}</span>
-                    {i18n.language === "en" && <span className="text-primary">✓</span>}
+                    {i18n.language === "en" && <span className="text-primary">v</span>}
                   </DropdownMenu.Item>
                 </DropdownMenu.SubContent>
               </DropdownMenu.Sub>

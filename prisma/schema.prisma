@@ -8,6 +8,20 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+enum PaymentProvider {
+  MIDTRANS
+  DUITKU
+  PAKKASIR
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  EXPIRED
+  CANCELED
+}
+
 model Category {
   id        String      @id @default(cuid())
   slug      String      @unique
@@ -63,7 +77,50 @@ model UserProfile {
   username  String?
   photoUrl  String?
   calorieQuantities Json?
-  burnList          Json?
+  burnList  Json?
+  isPremium Boolean @default(false)
+  premiumProvider PaymentProvider?
+  premiumSince DateTime?
+  premiumUntil DateTime?
+  payments PaymentTransaction[]
+  customMenuItems CustomMenuItem[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model PaymentTransaction {
+  id                String          @id @default(cuid())
+  uid               String
+  provider          PaymentProvider
+  status            PaymentStatus   @default(PENDING)
+  orderId           String          @unique
+  amount            Int
+  currency          String          @default("IDR")
+  checkoutUrl       String?
+  externalReference String?
+  paidAt            DateTime?
+  expiresAt         DateTime?
+  rawRequest        Json?
+  rawResponse       Json?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  user              UserProfile     @relation(fields: [uid], references: [uid], onDelete: Cascade)
+
+  @@index([uid, status])
+  @@index([provider, status])
+  @@index([externalReference])
+}
+
+model CustomMenuItem {
+  id        String      @id @default(cuid())
+  uid       String
+  name      String
+  calories  Int
+  imagePath String?
+  position  Int         @default(0)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  user      UserProfile @relation(fields: [uid], references: [uid], onDelete: Cascade)
+
+  @@index([uid, position])
 }

@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
+import { toast } from "@/components/ui/sonner";
 import { useAuth } from '@/hooks/useAuth';
 import { useTranslation } from "react-i18next";
 
@@ -22,7 +23,7 @@ const Landing: React.FC = () => {
     }
 
     console.error("Google sign-in failed:", error);
-    window.alert(t("header.googleLoginFailed"));
+    toast.error(t("header.googleLoginFailed"));
   };
 
   const handleOpenApp = () => {

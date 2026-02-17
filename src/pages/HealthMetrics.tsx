@@ -572,7 +572,7 @@ const HealthMetricsContent: React.FC<HealthMetricsContentProps> = ({ embedded = 
               if (!error) {
                 window.location.assign(redirectPath);
               } else {
-                window.alert(t("header.googleLoginFailed"));
+                toast.error(t("header.googleLoginFailed"));
               }
             }}
             className="w-full"

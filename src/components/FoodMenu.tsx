@@ -10,9 +10,17 @@ interface FoodMenuProps {
   items: MenuItemWithMeta[];
   categoryId: string;
   embedded?: boolean;
+  allowCustomDelete?: boolean;
+  onDeleteCustomItem?: (id: string) => void;
 }
 
-const FoodMenu: React.FC<FoodMenuProps> = ({ items, categoryId, embedded = false }) => {
+const FoodMenu: React.FC<FoodMenuProps> = ({
+  items,
+  categoryId,
+  embedded = false,
+  allowCustomDelete = false,
+  onDeleteCustomItem,
+}) => {
   const { t } = useTranslation();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [showTopButton, setShowTopButton] = useState(false);
@@ -95,7 +103,13 @@ const FoodMenu: React.FC<FoodMenuProps> = ({ items, categoryId, embedded = false
             }
           >
             {items.map((item) => (
-              <FoodCard key={item.id} item={item} embedded={embedded} />
+              <FoodCard
+                key={item.id}
+                item={item}
+                embedded={embedded}
+                canDelete={allowCustomDelete && categoryId === "custom"}
+                onDelete={onDeleteCustomItem}
+              />
             ))}
           </div>
         </div>

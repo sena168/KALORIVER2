@@ -9,6 +9,8 @@ import { useTranslation } from "react-i18next";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
 import type { ItemQuantity } from "@/hooks/useCalorieState";
+import { Button } from "@/components/ui/button";
+import { toast } from "@/components/ui/sonner";
 
 const GUEST_CALORIE_KEY = "calorie-quantities-guest";
 const userCalorieKey = (uid: string) => `calorie-quantities:${uid}`;
@@ -45,12 +47,18 @@ interface CalculatorContentProps {
 export const CalculatorContent: React.FC<CalculatorContentProps> = ({ embedded = false }) => {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const { profile, saveProfile } = useProfile(Boolean(user));
-  const { categories: menuData, isLoading } = useMenuData({ includeHidden: false });
+  const { profile, isLoading: profileLoading, saveProfile } = useProfile(Boolean(user));
+  const { categories: menuData, isLoading, refetch } = useMenuData({ includeHidden: false });
   const [activeCategory, setActiveCategory] = useState<string>(menuData[0]?.id || 'makanan-utama');
   const [guestQuantities, setGuestQuantities] = useState<ItemQuantity>(() =>
     readStoredQuantities(GUEST_CALORIE_KEY),
   );
+  const [showCustomModal, setShowCustomModal] = useState(false);
+  const [customName, setCustomName] = useState("");
+  const [customCalories, setCustomCalories] = useState("");
+  const [customImagePreview, setCustomImagePreview] = useState("");
+  const [customImageDataUrl, setCustomImageDataUrl] = useState("");
+  const [customBusy, setCustomBusy] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -83,12 +91,114 @@ export const CalculatorContent: React.FC<CalculatorContentProps> = ({ embedded =
     const category = menuData.find(cat => cat.id === activeCategory);
     return category?.items || [];
   }, [menuData, activeCategory]);
+  const isPremium = Boolean(user && profile?.isPremium);
+  const canManageCustom = isPremium && activeCategory === "custom";
+
+  const getAuthHeaders = useCallback(async () => {
+    if (!user) throw new Error("Not authenticated");
+    const token = await user.getIdToken(true);
+    return { Authorization: `Bearer ${token}` };
+  }, [user]);
+
+  const handleCustomImageChange: React.ChangeEventHandler<HTMLInputElement> = (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (!["image/png", "image/jpeg", "image/jpg"].includes(file.type)) {
+      toast.error(t("customMenu.errors.imageType"));
+      return;
+    }
+    if (file.size > 1024 * 1024) {
+      toast.error(t("customMenu.errors.imageSize"));
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const value = String(reader.result || "");
+      setCustomImagePreview(value);
+      setCustomImageDataUrl(value);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const resetCustomForm = () => {
+    setCustomName("");
+    setCustomCalories("");
+    setCustomImagePreview("");
+    setCustomImageDataUrl("");
+  };
+
+  const handleSaveCustomMenu = async () => {
+    if (!user || customBusy) return;
+    const calories = Number(customCalories);
+    if (!customName.trim()) {
+      toast.error(t("customMenu.errors.nameRequired"));
+      return;
+    }
+    if (!Number.isFinite(calories) || calories < 0) {
+      toast.error(t("customMenu.errors.caloriesInvalid"));
+      return;
+    }
+    setCustomBusy(true);
+    try {
+      const headers = await getAuthHeaders();
+      const res = await fetch("/api/custom-menu", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...headers },
+        body: JSON.stringify({
+          name: customName.trim(),
+          calories,
+          imagePath: customImageDataUrl || undefined,
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        const message =
+          typeof data?.error === "string" ? data.error : t("customMenu.errors.saveFailed");
+        throw new Error(message);
+      }
+      await refetch();
+      resetCustomForm();
+      setShowCustomModal(false);
+      toast.success(t("customMenu.messages.saved"));
+    } catch (error) {
+      console.error(error);
+      toast.error(error instanceof Error ? error.message : t("customMenu.errors.saveFailed"));
+    } finally {
+      setCustomBusy(false);
+    }
+  };
+
+  const handleDeleteCustomItem = useCallback(
+    async (id: string) => {
+      if (!user) return;
+      try {
+        const headers = await getAuthHeaders();
+        const res = await fetch("/api/custom-menu", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json", ...headers },
+          body: JSON.stringify({ id }),
+        });
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          const message =
+            typeof data?.error === "string" ? data.error : t("customMenu.errors.deleteFailed");
+          throw new Error(message);
+        }
+        await refetch();
+        toast.success(t("customMenu.messages.deleted"));
+      } catch (error) {
+        console.error(error);
+        toast.error(error instanceof Error ? error.message : t("customMenu.errors.deleteFailed"));
+      }
+    },
+    [user, getAuthHeaders, refetch, t],
+  );
 
   const userStored = user ? readStoredWithFlag(userCalorieKey(user.uid)) : { data: {}, hasKey: false };
   const initialQuantities = user
     ? userStored.hasKey
       ? userStored.data
-      : profile?.calorieQuantities ?? {}
+      : profile?.calorieQuantities ?? (profileLoading ? guestQuantities : {})
     : guestQuantities;
   const hydrateKey = user ? `${user.uid}:${profile?.id ?? "none"}` : "guest";
   const persistQuantities = useCallback(
@@ -172,11 +282,76 @@ export const CalculatorContent: React.FC<CalculatorContentProps> = ({ embedded =
               : "flex flex-col flex-1 min-h-0 mt-[8.5rem] md:mt-[10rem] lg:mt-[12rem] mb-20 md:mb-24 lg:mb-28"
           }
         >
-          <FoodMenu items={activeItems} categoryId={activeCategory} embedded={embedded} />
+          {canManageCustom && (
+            <div className={`${embedded ? "px-2 pb-2" : "container mx-auto px-4 pb-2"} flex justify-end`}>
+              <Button onClick={() => setShowCustomModal(true)}>{t("customMenu.addButton")}</Button>
+            </div>
+          )}
+          <FoodMenu
+            items={activeItems}
+            categoryId={activeCategory}
+            embedded={embedded}
+            allowCustomDelete={canManageCustom}
+            onDeleteCustomItem={handleDeleteCustomItem}
+          />
         </main>
         
         {/* Fixed Bottom Bar */}
         <BottomBar embedded={embedded} />
+
+        {showCustomModal && (
+          <div className="fixed inset-0 z-[80] bg-black/60 flex items-center justify-center p-4">
+            <div className="bg-card border border-border rounded-xl w-full max-w-lg p-6 shadow-xl space-y-4">
+              <h2 className="text-tv-subtitle text-foreground">{t("customMenu.modalTitle")}</h2>
+              <label className="block">
+                <span className="text-tv-small text-muted-foreground">{t("customMenu.fields.name")}</span>
+                <input
+                  value={customName}
+                  onChange={(event) => setCustomName(event.target.value)}
+                  className="mt-2 w-full rounded-lg border border-input bg-background px-4 py-3 text-foreground"
+                />
+              </label>
+              <label className="block">
+                <span className="text-tv-small text-muted-foreground">{t("customMenu.fields.calories")}</span>
+                <input
+                  type="number"
+                  min={0}
+                  value={customCalories}
+                  onChange={(event) => setCustomCalories(event.target.value)}
+                  className="mt-2 w-full rounded-lg border border-input bg-background px-4 py-3 text-foreground"
+                />
+              </label>
+              <label className="block">
+                <span className="text-tv-small text-muted-foreground">{t("customMenu.fields.image")}</span>
+                <input
+                  type="file"
+                  accept="image/png,image/jpeg"
+                  onChange={handleCustomImageChange}
+                  className="mt-2 w-full text-sm text-muted-foreground"
+                />
+              </label>
+              {customImagePreview && (
+                <div className="w-24 h-24 rounded-lg overflow-hidden border border-border">
+                  <img src={customImagePreview} alt={t("customMenu.previewAlt")} className="w-full h-full object-cover" />
+                </div>
+              )}
+              <div className="flex justify-end gap-3">
+                <Button
+                  variant="secondary"
+                  onClick={() => {
+                    resetCustomForm();
+                    setShowCustomModal(false);
+                  }}
+                >
+                  {t("actions.cancel")}
+                </Button>
+                <Button onClick={() => void handleSaveCustomMenu()} disabled={customBusy}>
+                  {customBusy ? t("actions.saving") : t("actions.save")}
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </CalorieProvider>
   );

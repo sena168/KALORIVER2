@@ -9,9 +9,11 @@ import { useTranslation } from "react-i18next";
 interface FoodCardProps {
   item: MenuItemWithMeta;
   embedded?: boolean;
+  canDelete?: boolean;
+  onDelete?: (id: string) => void;
 }
 
-const FoodCard: React.FC<FoodCardProps> = ({ item, embedded = false }) => {
+const FoodCard: React.FC<FoodCardProps> = ({ item, embedded = false, canDelete = false, onDelete }) => {
   const { t } = useTranslation();
   const { getQuantity, incrementQuantity, decrementQuantity } = useCalories();
   const [imageError, setImageError] = useState(false);
@@ -32,14 +34,23 @@ const FoodCard: React.FC<FoodCardProps> = ({ item, embedded = false }) => {
   };
 
   return (
-    <div 
+    <div
       className={cn(
-        "bg-card rounded-xl transition-all duration-200 min-h-[9.5rem] md:min-h-[11rem] lg:min-h-[12.5rem]",
+        "relative bg-card rounded-xl transition-all duration-200 min-h-[9.5rem] md:min-h-[11rem] lg:min-h-[12.5rem]",
         embedded ? "p-3 md:p-4 lg:p-5" : "p-4 md:p-6 lg:p-7",
         "border border-border shadow-md hover:shadow-lg",
         hasQuantity && "ring-2 ring-primary/50 border-primary/30"
       )}
     >
+      {canDelete && onDelete && (
+        <button
+          type="button"
+          className="absolute top-2 right-2 text-xs rounded-md px-2 py-1 bg-destructive/20 text-destructive hover:bg-destructive/30"
+          onClick={() => onDelete(item.id)}
+        >
+          {t("actions.delete")}
+        </button>
+      )}
       {/* Mobile Layout (Vertical Stack) */}
       <div className="flex flex-col gap-3 md:hidden">
         {/* Image */}

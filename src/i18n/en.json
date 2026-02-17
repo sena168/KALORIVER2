@@ -10,6 +10,7 @@
     "loginGoogle": "Login With Google",
     "backToCalculator": "Back to Calculator",
     "confirmSignOut": "Sign out from account?",
+    "confirm": "Confirm",
     "signOut": "Sign Out",
     "save": "Save",
     "saving": "Saving...",
@@ -31,6 +32,7 @@
     "splitLink": "Calculator / BMI",
     "calculator": "Calculator",
     "bmiIndex": "BMI Index",
+    "payment": "Premium",
     "splitView": "Split View",
     "setupProfile": "Setup Profile",
     "profileTitle": "Profile",
@@ -46,6 +48,59 @@
     "bmiLoginRequiredConfirm": "BMI Index requires login. Continue to login?",
     "googleLoginFailed": "Failed to login with Google. Please try again.",
     "profileSetupToast": "Please complete your profile first to use BMI index."
+  },
+  "payment": {
+    "title": "Upgrade Premium",
+    "subtitle": "Choose a payment method to unlock premium and custom menu features.",
+    "loading": "Loading payments...",
+    "planLabel": "Plan:",
+    "planNameFallback": "Premium",
+    "methodsTitle": "Payment Methods",
+    "available": "Available",
+    "unavailable": "Unavailable",
+    "checkStatus": "Check Status",
+    "checking": "Checking...",
+    "payNow": "Pay Now",
+    "processing": "Processing...",
+    "latestTransaction": "Latest Transaction",
+    "orderId": "Order ID",
+    "transactionStatus": "Status",
+    "noTransaction": "No transaction yet.",
+    "messages": {
+      "paymentSuccess": "Payment successful. Premium is active.",
+      "alreadyPremium": "Account is already premium."
+    },
+    "status": {
+      "premiumActive": "Premium Active",
+      "notPremium": "Not Premium"
+    },
+    "errors": {
+      "loadOptions": "Failed to load payment options.",
+      "createCheckout": "Failed to create payment checkout.",
+      "checkStatus": "Failed to check payment status."
+    }
+  },
+  "customMenu": {
+    "addButton": "Add Custom Menu",
+    "modalTitle": "Add Custom Menu",
+    "previewAlt": "Custom menu preview",
+    "fields": {
+      "name": "Menu Name",
+      "calories": "Calories",
+      "image": "Image (optional)"
+    },
+    "messages": {
+      "saved": "Custom menu saved.",
+      "deleted": "Custom menu deleted."
+    },
+    "errors": {
+      "nameRequired": "Menu name is required.",
+      "caloriesInvalid": "Calories must be 0 or greater.",
+      "imageType": "Image must be PNG or JPG.",
+      "imageSize": "Max image size is 1MB.",
+      "saveFailed": "Failed to save custom menu.",
+      "deleteFailed": "Failed to delete custom menu."
+    }
   },
   "landing": {
     "heroAlt": "BMI Hero"

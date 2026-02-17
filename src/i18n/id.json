@@ -10,6 +10,7 @@
     "loginGoogle": "Masuk Dengan Google",
     "backToCalculator": "Kembali ke Kalkulator",
     "confirmSignOut": "Keluar dari akun?",
+    "confirm": "Konfirmasi",
     "signOut": "Keluar",
     "save": "Simpan",
     "saving": "Menyimpan...",
@@ -31,6 +32,7 @@
     "splitLink": "Kalkulator / BMI",
     "calculator": "Kalkulator",
     "bmiIndex": "Indeks BMI",
+    "payment": "Premium",
     "splitView": "Tampilan Split",
     "setupProfile": "Atur Profil",
     "profileTitle": "Profil",
@@ -46,6 +48,59 @@
     "bmiLoginRequiredConfirm": "Indeks BMI memerlukan login. Lanjutkan login?",
     "googleLoginFailed": "Gagal masuk dengan Google. Coba lagi.",
     "profileSetupToast": "Harap lengkapi profil terlebih dahulu untuk menggunakan indeks BMI."
+  },
+  "payment": {
+    "title": "Upgrade Premium",
+    "subtitle": "Pilih pembayaran untuk membuka fitur premium dan menu kustom.",
+    "loading": "Memuat pembayaran...",
+    "planLabel": "Paket:",
+    "planNameFallback": "Premium",
+    "methodsTitle": "Metode Pembayaran",
+    "available": "Tersedia",
+    "unavailable": "Belum tersedia",
+    "checkStatus": "Cek Status",
+    "checking": "Mengecek...",
+    "payNow": "Bayar Sekarang",
+    "processing": "Memproses...",
+    "latestTransaction": "Transaksi Terakhir",
+    "orderId": "Order ID",
+    "transactionStatus": "Status",
+    "noTransaction": "Belum ada transaksi.",
+    "messages": {
+      "paymentSuccess": "Pembayaran berhasil. Akun premium aktif.",
+      "alreadyPremium": "Akun sudah premium."
+    },
+    "status": {
+      "premiumActive": "Premium Aktif",
+      "notPremium": "Belum Premium"
+    },
+    "errors": {
+      "loadOptions": "Gagal memuat opsi pembayaran.",
+      "createCheckout": "Gagal membuat sesi pembayaran.",
+      "checkStatus": "Gagal cek status pembayaran."
+    }
+  },
+  "customMenu": {
+    "addButton": "Tambah Menu Custom",
+    "modalTitle": "Tambah Menu Custom",
+    "previewAlt": "Pratinjau menu custom",
+    "fields": {
+      "name": "Nama Menu",
+      "calories": "Kalori",
+      "image": "Gambar (opsional)"
+    },
+    "messages": {
+      "saved": "Menu custom berhasil ditambahkan.",
+      "deleted": "Menu custom berhasil dihapus."
+    },
+    "errors": {
+      "nameRequired": "Nama menu wajib diisi.",
+      "caloriesInvalid": "Kalori harus angka 0 atau lebih.",
+      "imageType": "Format gambar harus PNG atau JPG.",
+      "imageSize": "Ukuran gambar maksimal 1MB.",
+      "saveFailed": "Gagal menyimpan menu custom.",
+      "deleteFailed": "Gagal menghapus menu custom."
+    }
   },
   "landing": {
     "heroAlt": "Gambar Hero BMI"

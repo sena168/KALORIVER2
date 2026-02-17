@@ -25,7 +25,18 @@ const getAuthHeaders = async () => {
 };
 
 const fetchMenu = async (includeHidden: boolean) => {
-  const headers = includeHidden ? await getAuthHeaders() : {};
+  let headers: Record<string, string> = {};
+  if (includeHidden) {
+    headers = await getAuthHeaders();
+  } else if (auth.currentUser) {
+    try {
+      const token = await auth.currentUser.getIdToken();
+      headers = { Authorization: `Bearer ${token}` };
+    } catch {
+      headers = {};
+    }
+  }
+
   const res = await fetch(includeHidden ? "/api/admin/menu" : "/api/menu", {
     headers,
   });
@@ -148,6 +159,7 @@ export const useMenuData = (options?: { includeHidden?: boolean; enabled?: boole
     categories: query.data ?? [],
     isLoading: query.isLoading,
     error: query.error,
+    refetch: query.refetch,
     addItem: createMutation.mutateAsync,
     updateItem: updateMutation.mutateAsync,
     deleteItem: deleteMutation.mutateAsync,

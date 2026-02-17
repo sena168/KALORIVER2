@@ -14,6 +14,10 @@ export type UserProfile = {
   photoUrl?: string | null;
   calorieQuantities?: Record<string, number> | null;
   burnList?: Array<{ key: string; met: number; minutes: number }> | null;
+  isPremium?: boolean;
+  premiumProvider?: "MIDTRANS" | "DUITKU" | "PAKKASIR" | null;
+  premiumSince?: string | null;
+  premiumUntil?: string | null;
 };
 
 const GUEST_CALORIE_KEY = "calorie-quantities-guest";
@@ -114,16 +118,31 @@ export const useProfile = (enabled: boolean) => {
     const profile = query.data?.profile ?? null;
     const hasProfileCalories = hasCalories(profile?.calorieQuantities);
     const hasProfileBurn = Boolean(profile?.burnList && profile.burnList.length > 0);
+    const uid = auth.currentUser?.uid;
 
-    const updates: Partial<UserProfile> = {};
-    if (!hasProfileCalories && hasGuestCalories && guestCalories) {
-      updates.calorieQuantities = guestCalories;
-    }
-    if (!hasProfileBurn && hasGuestBurn && guestBurn) {
-      updates.burnList = guestBurn;
-    }
+    const writeUserCalories = (data: Record<string, number>) => {
+      if (!uid) return;
+      const payload = JSON.stringify(data);
+      try {
+        window.localStorage.setItem(userCalorieKey(uid), payload);
+        window.localStorage.setItem(savedKeyFor(uid), payload);
+        window.localStorage.setItem(dirtyKeyFor(uid), "false");
+        window.dispatchEvent(new Event("calorie-quantities-updated"));
+      } catch {
+        // ignore storage failures
+      }
+    };
 
-    const finalizeCleanup = () => {
+    const writeUserBurn = (data: Array<{ key: string; met: number; minutes: number }>) => {
+      if (!uid) return;
+      try {
+        window.localStorage.setItem(userBurnKey(uid), JSON.stringify(data));
+      } catch {
+        // ignore storage failures
+      }
+    };
+
+    const cleanupGuest = () => {
       try {
         window.localStorage.removeItem(GUEST_CALORIE_KEY);
         window.localStorage.removeItem(GUEST_BURN_KEY);
@@ -134,38 +153,36 @@ export const useProfile = (enabled: boolean) => {
       }
     };
 
-    if (Object.keys(updates).length === 0) {
-      finalizeCleanup();
+    if (hasProfileCalories && profile?.calorieQuantities) {
+      writeUserCalories(profile.calorieQuantities);
+    }
+    if (hasProfileBurn && profile?.burnList) {
+      writeUserBurn(profile.burnList);
+    }
+
+    if (hasProfileCalories || hasProfileBurn) {
+      cleanupGuest();
       return;
     }
 
-    mutation
-      .mutateAsync(updates)
-      .then(() => {
-        const uid = auth.currentUser?.uid;
-        if (!uid) return;
-        if (updates.calorieQuantities) {
-          const payload = JSON.stringify(updates.calorieQuantities);
-          try {
-            window.localStorage.setItem(userCalorieKey(uid), payload);
-            window.localStorage.setItem(savedKeyFor(uid), payload);
-            window.localStorage.setItem(dirtyKeyFor(uid), "false");
-            window.dispatchEvent(new Event("calorie-quantities-updated"));
-          } catch {
-            // ignore storage failures
-          }
-        }
-        if (updates.burnList) {
-          try {
-            window.localStorage.setItem(userBurnKey(uid), JSON.stringify(updates.burnList));
-          } catch {
-            // ignore storage failures
-          }
-        }
-      })
-      .finally(() => {
-        finalizeCleanup();
-      });
+    if (!hasGuestCalories && !hasGuestBurn) {
+      cleanupGuest();
+      return;
+    }
+
+    const updates: Partial<UserProfile> = {};
+    if (hasGuestCalories && guestCalories) {
+      updates.calorieQuantities = guestCalories;
+      writeUserCalories(guestCalories);
+    }
+    if (hasGuestBurn && guestBurn) {
+      updates.burnList = guestBurn;
+      writeUserBurn(guestBurn);
+    }
+
+    mutation.mutateAsync(updates).then(cleanupGuest).catch(() => {
+      // keep guest data if save fails
+    });
   }, [enabled, query.isLoading, query.data?.profile, mutation]);
 
   return {

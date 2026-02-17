@@ -6,6 +6,7 @@ import Index from "./pages/Index";
 import AdminDashboard from "./pages/AdminDashboard";
 import HealthMetrics from "./pages/HealthMetrics";
 import SplitView from "./pages/SplitView";
+import Payment from "./pages/Payment";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ const App = () => {
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/health-metrics" element={<HealthMetrics />} />
             <Route path="/kalkulator-bmi" element={<SplitView />} />
+            <Route path="/payment" element={<Payment />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
