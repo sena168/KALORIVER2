@@ -11,6 +11,7 @@ import { useProfile } from "@/hooks/useProfile";
 import type { ItemQuantity } from "@/hooks/useCalorieState";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/sonner";
+import { Link } from "react-router-dom";
 
 const GUEST_CALORIE_KEY = "calorie-quantities-guest";
 const userCalorieKey = (uid: string) => `calorie-quantities:${uid}`;
@@ -77,22 +78,36 @@ export const CalculatorContent: React.FC<CalculatorContentProps> = ({ embedded =
     }
   }, [user, profile?.calorieQuantities]);
 
+  const categoriesForTabs = useMemo(() => {
+    if (!user) return menuData;
+    if (menuData.some((category) => category.id === "custom")) return menuData;
+    return [
+      ...menuData,
+      {
+        id: "custom",
+        label: "Custom",
+        items: [],
+      },
+    ];
+  }, [menuData, user]);
+
   useEffect(() => {
-    if (!menuData.find((category) => category.id === activeCategory) && menuData.length > 0) {
-      setActiveCategory(menuData[0].id);
+    if (!categoriesForTabs.find((category) => category.id === activeCategory) && categoriesForTabs.length > 0) {
+      setActiveCategory(categoriesForTabs[0].id);
     }
-  }, [menuData, activeCategory]);
+  }, [categoriesForTabs, activeCategory]);
 
   const handleCategoryChange = useCallback((categoryId: string) => {
     setActiveCategory(categoryId);
   }, []);
 
   const activeItems = useMemo(() => {
-    const category = menuData.find(cat => cat.id === activeCategory);
+    const category = categoriesForTabs.find(cat => cat.id === activeCategory);
     return category?.items || [];
-  }, [menuData, activeCategory]);
+  }, [categoriesForTabs, activeCategory]);
   const isPremium = Boolean(user && profile?.isPremium);
   const canManageCustom = isPremium && activeCategory === "custom";
+  const isCustomTab = activeCategory === "custom";
 
   const getAuthHeaders = useCallback(async () => {
     if (!user) throw new Error("Not authenticated");
@@ -267,7 +282,7 @@ export const CalculatorContent: React.FC<CalculatorContentProps> = ({ embedded =
         
         {/* Fixed Category Tabs */}
         <CategoryTabs
-          categories={menuData}
+          categories={categoriesForTabs}
           activeCategory={activeCategory}
           onCategoryChange={handleCategoryChange}
           embedded={embedded}
@@ -285,6 +300,19 @@ export const CalculatorContent: React.FC<CalculatorContentProps> = ({ embedded =
           {canManageCustom && (
             <div className={`${embedded ? "px-2 pb-2" : "container mx-auto px-4 pb-2"} flex justify-end`}>
               <Button onClick={() => setShowCustomModal(true)}>{t("customMenu.addButton")}</Button>
+            </div>
+          )}
+          {isCustomTab && user && !isPremium && (
+            <div className={`${embedded ? "px-2 pb-2" : "container mx-auto px-4 pb-2"}`}>
+              <div className="rounded-xl border border-border bg-card p-4 md:p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                <div>
+                  <p className="text-tv-body text-foreground">{t("customMenu.upgradeTitle")}</p>
+                  <p className="text-tv-small text-muted-foreground">{t("customMenu.upgradeSubtitle")}</p>
+                </div>
+                <Button asChild>
+                  <Link to="/payment">{t("customMenu.upgradeButton")}</Link>
+                </Button>
+              </div>
             </div>
           )}
           <FoodMenu

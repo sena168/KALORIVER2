@@ -81,9 +81,13 @@
     }
   },
   "customMenu": {
+    "tabLabel": "Custom",
     "addButton": "Tambah Menu Custom",
     "modalTitle": "Tambah Menu Custom",
     "previewAlt": "Pratinjau menu custom",
+    "upgradeTitle": "Menu custom hanya untuk akun premium.",
+    "upgradeSubtitle": "Upgrade premium untuk membuat menu sendiri.",
+    "upgradeButton": "Upgrade Premium",
     "fields": {
       "name": "Nama Menu",
       "calories": "Kalori",

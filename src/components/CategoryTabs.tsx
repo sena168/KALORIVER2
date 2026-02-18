@@ -1,6 +1,7 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import type { MenuCategoryWithMeta } from '@/hooks/useMenuData';
+import { useTranslation } from "react-i18next";
 
 interface CategoryTabsProps {
   categories: MenuCategoryWithMeta[];
@@ -15,6 +16,7 @@ const CategoryTabs: React.FC<CategoryTabsProps> = ({
   onCategoryChange,
   embedded = false,
 }) => {
+  const { t } = useTranslation();
   return (
     <div
       className={
@@ -37,7 +39,7 @@ const CategoryTabs: React.FC<CategoryTabsProps> = ({
                   : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
               )}
             >
-              {category.label}
+              {category.id === "custom" ? t("customMenu.tabLabel") : category.label}
             </button>
           ))}
         </div>

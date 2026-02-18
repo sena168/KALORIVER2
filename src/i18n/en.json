@@ -81,9 +81,13 @@
     }
   },
   "customMenu": {
+    "tabLabel": "Custom",
     "addButton": "Add Custom Menu",
     "modalTitle": "Add Custom Menu",
     "previewAlt": "Custom menu preview",
+    "upgradeTitle": "Custom menu is premium only.",
+    "upgradeSubtitle": "Upgrade to premium to create your own menu.",
+    "upgradeButton": "Upgrade Premium",
     "fields": {
       "name": "Menu Name",
       "calories": "Calories",
